@@ -24,8 +24,8 @@ axiosClient.interceptors.response.use(
   (response) => {
     const { code, result, message } = response.data;
 
-    if (code === 200) {
-      return response.data.result;
+    if (code === 1000) {
+      return response;
     } else {
       return Promise.reject(response.data.message);
     }

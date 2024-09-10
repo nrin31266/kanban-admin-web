@@ -1,20 +1,31 @@
-import { Button, Card, Checkbox, Form, Input, Space, Typography } from "antd";
+import { Button, Card, Checkbox, Form, Input, message, Space, Typography } from "antd";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import SocialLogin from "./components/SocialLogin";
 import handleAPI from "../../apis/handleAPI";
-
+import { useDispatch } from "react-redux";
+import { addAuth } from "../../redux/reducers/authReducer";
 const { Title, Paragraph, Text } = Typography;
 
 const Login = () => {
+  const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
   const [isRemember, setIsRemember] = useState(false);
-
+  const api= "/kanban/auth/login";
   const handleLogin = async (values: { email: string; password: string }) => {
-    console.log(values);
-    
-
+    setIsLoading(true);
+    try {
+      const res = await handleAPI(api, values, 'post'); 
+      message.success('Login successfully!')
+      dispatch(addAuth(res.data.result));
+      
+    } catch (error : any) {
+      console.log(error);
+      message.error(error.message);
+    }finally{
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -22,6 +33,7 @@ const Login = () => {
       <Card
         style={{
         }}
+        
       >
         <div className="text-center">
           <img
@@ -73,12 +85,7 @@ const Login = () => {
         </Form>
         <div className="row">
           <div className="col">
-            <Checkbox
-              checked={isRemember}
-              onChange={(value) => setIsRemember(value.target.checked)}
-            >
-              Remember for 30 days
-            </Checkbox>
+
           </div>
           <div className="col text-right">
             <Link to={"/"}>Forgot password?</Link>
@@ -87,6 +94,7 @@ const Login = () => {
 
         <div className="mt-4 mb-3">
           <Button
+            loading={isLoading}
             onClick={() => form.submit()}
             type="primary"
             style={{
