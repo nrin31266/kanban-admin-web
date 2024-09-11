@@ -1,19 +1,33 @@
-import { Button } from 'antd'
+import { Button, message } from 'antd'
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import { removeAuth } from '../redux/reducers/authReducer';
+import { addAuth, removeAuth } from '../redux/reducers/authReducer';
+import handleAPI from '../apis/handleAPI';
+import { API } from '../configurations/configurations';
+import { getToken } from '../services/localStoreService';
 
 const HomeScreen = () => {
   const dispatch = useDispatch();
-  const handleLogout = ()=> {
-    dispatch(removeAuth(null))
+  const handleLogout = async () => {
+    try {
+      const dataToken = getToken();
+      console.log('Token Data:', dataToken); // Kiểm tra giá trị của dataToken
+      if (dataToken) { 
+        await handleAPI(API.LOGOUT, dataToken, 'post'); 
+      }
+      dispatch(removeAuth(null))
+      message.success('Signed out successfully');
+    } catch (error:any) {
+      console.log(error);
+      message.error(error.message);
+    }
   };
 
   return (
     <div>
-        <Button
+      <Button
         onClick={handleLogout}
-        >Logout</Button>
+      >Logout</Button>
     </div>
   )
 }

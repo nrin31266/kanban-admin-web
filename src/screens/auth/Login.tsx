@@ -5,18 +5,19 @@ import SocialLogin from "./components/SocialLogin";
 import handleAPI from "../../apis/handleAPI";
 import { useDispatch } from "react-redux";
 import { addAuth } from "../../redux/reducers/authReducer";
+import { API } from "../../configurations/configurations";
 const { Title, Paragraph, Text } = Typography;
+
 
 const Login = () => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
   const [isRemember, setIsRemember] = useState(false);
-  const api= "/kanban/auth/login";
   const handleLogin = async (values: { email: string; password: string }) => {
     setIsLoading(true);
     try {
-      const res = await handleAPI(api, values, 'post'); 
+      const res = await handleAPI(API.LOGIN, values, 'post'); 
       message.success('Login successfully!')
       dispatch(addAuth(res.data.result));
       
@@ -37,13 +38,13 @@ const Login = () => {
       >
         <div className="text-center">
           <img
+            className="mb-3"
             src="https://firebasestorage.googleapis.com/v0/b/kanban-ac9c5.appspot.com/o/kanban-logo.png?alt=media&token=b72b8db5-b31d-4ae9-aab8-8bd7e10e6d8e"
             alt="kanban-logo"
             style={{
               width: "48px",
               height: "48px",
             }}
-            className="mb-3"
           />
           <Title level={2}>Login to your account</Title>
           <Paragraph type="secondary">

@@ -15,9 +15,9 @@ const Routers = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = getToken();
-        if (token) {
-          dispatch(addAuth(JSON.parse(token))); 
+        const dataToken = getToken();
+        if (dataToken) {
+          dispatch(addAuth(dataToken)); 
         }
       } catch (error) {
         console.error('Error fetching token:', error);

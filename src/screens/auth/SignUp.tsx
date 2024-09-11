@@ -5,8 +5,7 @@ import SocialLogin from "./components/SocialLogin";
 import handleAPI from "../../apis/handleAPI";
 import { addAuth } from "../../redux/reducers/authReducer";
 import { useDispatch } from "react-redux";
-import { getToken, removeToken, setToken } from "../../services/localStoreService";
-
+import { API } from "../../configurations/configurations";
 const { Title, Paragraph, Text } = Typography;
 
 const SignUp = () => {
@@ -21,8 +20,8 @@ const SignUp = () => {
   const handleSignUp = async (values: {name:string; email: string; password: string }) => {
     setIsLoading(true);
     try {
-      await handleAPI(apiSignUp, values, 'post');
-      const res = await handleAPI(apiSignIn, values, 'post');
+      await handleAPI(API.SIGNUP, values, 'post');
+      const res = await handleAPI(API.LOGIN, values, 'post');
       message.success('Register successfully!')
       dispatch(addAuth(res.data.result));
     } catch (error: any) {
@@ -35,7 +34,7 @@ const SignUp = () => {
   return (
     <>
       <Card style={{
-        width: '80%'
+        width: '100%'
       }}>
         <div className="text-center">
         <img
