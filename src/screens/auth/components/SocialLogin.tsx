@@ -30,12 +30,10 @@ const SocialLogin = () => {
             idToken: idToken,
         };
         const res = await handleAPI(API.LOGIN_WITH_GOOGLE, data, 'post'); 
-        console.log(res.data);
-        // Disconnect firebase
+        // Disconnect firebase client
         await signOut(auth);
-
-        message.success('Login successfully!')
         dispatch(addAuth(res.data.result));
+        message.success('Login with google successfully!');
       }else{
         message.error('Can not sign in');
       }

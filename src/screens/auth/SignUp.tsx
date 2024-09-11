@@ -21,20 +21,23 @@ const SignUp = () => {
     setIsLoading(true);
     try {
       await handleAPI(API.SIGNUP, values, 'post');
-      const res = await handleAPI(API.LOGIN, values, 'post');
-      message.success('Register successfully!')
-      dispatch(addAuth(res.data.result));
+      
+      
+      // const res = await handleAPI(API.LOGIN, values, 'post');
+      // dispatch(addAuth(res.data.result));
     } catch (error: any) {
       console.log(error);
       message.error(error.message)
     }
+    message.success('Register successfully!');
+    navigate('/');
     setIsLoading(false);
   };
 
   return (
     <>
       <Card style={{
-        width: '100%'
+        width: '380px'
       }}>
         <div className="text-center">
         <img

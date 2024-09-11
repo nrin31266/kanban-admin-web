@@ -5,14 +5,14 @@ export interface AuthState {
     token: string;
 }
 
-const initState: AuthState = {
+const initialState : AuthState = {
     token: '',
 };
 
 const authSlide = createSlice({
     name: 'auth',
     initialState: {
-        data: initState
+        data: initialState 
     },
     reducers: {
         addAuth: (state, action) => {
@@ -20,9 +20,12 @@ const authSlide = createSlice({
             syncLocal(action.payload);
         },
         removeAuth: (state, _action) => {
-            state.data = initState;
-            syncLocal(null); // Gọi syncLocal với null để xóa dữ liệu
-        }
+			state.data = initialState;
+			syncLocal({});
+		},
+		refreshtoken: (state, action) => {
+			state.data.token = action.payload;
+		},
     }
 });
 
@@ -31,11 +34,9 @@ export const { addAuth, removeAuth } = authSlide.actions;
 
 export const authSelector = (state: any) => state.authReducer.data;
 
-// Cập nhật hoặc xóa dữ liệu trong localStorage
-const syncLocal = (data: AuthState | null) => {
+
+const syncLocal = (data: any) => {
     if (data) {
-        setToken(JSON.stringify(data)); // Lưu đối tượng dữ liệu vào localStorage
-    } else {
-        removeToken(); // Xóa dữ liệu khỏi localStorage
+        setToken(JSON.stringify(data));
     }
 };

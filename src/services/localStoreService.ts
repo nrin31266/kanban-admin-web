@@ -1,6 +1,5 @@
 import { localDataNames } from "../constants/appInfos";
 
-
 export const KEY_TOKEN = localDataNames.accessToken;
 
 export const setToken = (token: any) => {
@@ -9,7 +8,7 @@ export const setToken = (token: any) => {
 
 export const getToken = () => {
   const data = localStorage.getItem(KEY_TOKEN);
-  return data?JSON.parse(data) : null;
+  return data?JSON.parse(data) : {};
 };
 
 export const removeToken = () => {

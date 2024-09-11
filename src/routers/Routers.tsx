@@ -1,35 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import AuthRouter from './AuthRouter';
-import MainRouter from './MainRouter';
+/** @format */
+
 import { useDispatch, useSelector } from 'react-redux';
 import { addAuth, authSelector, AuthState } from '../redux/reducers/authReducer';
-import { getToken } from '../services/localStoreService';
+import AuthRouter from './AuthRouter';
+import MainRouter from './MainRouter';
+import { useEffect, useState } from 'react';
+import { localDataNames } from '../constants/appInfos';
 import { Spin } from 'antd';
+import { getToken } from '../services/localStoreService';
 
 const Routers = () => {
-  const [isLoading, setIsLoading] = useState(true); 
+	const [isLoading, setIsLoading] = useState(false);
 
-  const auth: AuthState = useSelector(authSelector);
-  const dispatch = useDispatch();
+	const auth: AuthState = useSelector(authSelector);
+	const dispatch = useDispatch();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const dataToken = getToken();
-        if (dataToken) {
-          dispatch(addAuth(dataToken)); 
-        }
-      } catch (error) {
-        console.error('Error fetching token:', error);
-      } finally {
-        setIsLoading(false); 
-      }
-    };
+	useEffect(() => {
+		getData();
+	}, []);
 
-    fetchData();
-  }, [dispatch]);
+	const getData = async () => {
+		const res = getToken();
+		res && dispatch(addAuth(res));
+	};
 
-  return isLoading ? <Spin /> : !auth.token ? <AuthRouter /> : <MainRouter />;
+	return isLoading ? <Spin /> : !auth.token ? <AuthRouter /> : <MainRouter />;
 };
 
 export default Routers;

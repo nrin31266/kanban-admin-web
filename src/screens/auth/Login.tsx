@@ -17,14 +17,14 @@ const Login = () => {
   const handleLogin = async (values: { email: string; password: string }) => {
     setIsLoading(true);
     try {
-      const res = await handleAPI(API.LOGIN, values, 'post'); 
+      const res = await handleAPI(API.LOGIN, values, 'post');
       message.success('Login successfully!')
       dispatch(addAuth(res.data.result));
-      
-    } catch (error : any) {
+
+    } catch (error: any) {
       console.log(error);
       message.error(error.message);
-    }finally{
+    } finally {
       setIsLoading(false);
     }
   };
@@ -33,8 +33,8 @@ const Login = () => {
     <>
       <Card
         style={{
+          width: '380px'
         }}
-        
       >
         <div className="text-center">
           <img
@@ -86,7 +86,11 @@ const Login = () => {
         </Form>
         <div className="row">
           <div className="col">
-
+            {/* <Checkbox
+              checked={isRemember}
+              onChange={(val) => setIsRemember(val.target.checked)}>
+              Remember for 30 days
+            </Checkbox> */}
           </div>
           <div className="col text-right">
             <Link to={"/"}>Forgot password?</Link>
