@@ -16,7 +16,7 @@ const Routers = () => {
 
 	useEffect(() => {
 		getData();
-	}, []);
+	}, [dispatch]);
 
 	const getData = async () => {
 		const res = localStorage.getItem(localDataNames.authData);

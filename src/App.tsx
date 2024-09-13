@@ -3,8 +3,9 @@
 import { ConfigProvider, message } from 'antd';
 import Routers from './routers/Routers';
 import { Provider } from 'react-redux';
-import store from './redux/store';
+
 import './App.css';
+import store from './redux/store';
 
 message.config({
 	top: 30,

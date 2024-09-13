@@ -3,21 +3,17 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { addAuth, authSelector, AuthState, refreshtoken, removeAuth } from '../redux/reducers/authReducer';
 import handleAPI from '../apis/handleAPI';
-import { API } from '../configurations/configurations';
-import { useNavigate } from 'react-router-dom';
-import { wait } from '@testing-library/user-event/dist/utils';
 import { getAuth } from '../apis/axiosClient';
-import { localDataNames } from '../constants/appInfos';
-import useSelection from 'antd/es/table/hooks/useSelection';
+import { API } from '../configurations/configurations';
 
 
 const HomeScreen = () => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
-  const auth: AuthState = useSelector(authSelector);
 
   useEffect(() => {
     const refreshAuthToken  = async () =>{
+      
       const auth = getAuth();
       if (auth){
         try {
@@ -32,6 +28,7 @@ const HomeScreen = () => {
           message.error(error.message);
         }
       }
+      
     }
 
     refreshAuthToken ();

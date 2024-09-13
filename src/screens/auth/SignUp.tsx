@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import SocialLogin from "./components/SocialLogin";
 import handleAPI from "../../apis/handleAPI";
 import { useDispatch } from "react-redux";
-import { API } from "../../configurations/configurations";
+import { API, appInfos } from "../../configurations/configurations";
 const { Title, Paragraph, Text } = Typography;
 
 const SignUp = () => {
@@ -37,7 +37,7 @@ const SignUp = () => {
       }}>
         <div className="text-center">
         <img
-            src="https://firebasestorage.googleapis.com/v0/b/kanban-ac9c5.appspot.com/o/kanban-logo.png?alt=media&token=b72b8db5-b31d-4ae9-aab8-8bd7e10e6d8e"
+            src={appInfos.logo}
             alt="kanban-logo"
             style={{
               width: "48px",
