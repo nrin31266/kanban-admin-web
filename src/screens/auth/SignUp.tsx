@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import SocialLogin from "./components/SocialLogin";
 import handleAPI from "../../apis/handleAPI";
-import { addAuth } from "../../redux/reducers/authReducer";
 import { useDispatch } from "react-redux";
 import { API } from "../../configurations/configurations";
 const { Title, Paragraph, Text } = Typography;
@@ -21,16 +20,13 @@ const SignUp = () => {
     setIsLoading(true);
     try {
       await handleAPI(API.SIGNUP, values, 'post');
-      
-      
-      // const res = await handleAPI(API.LOGIN, values, 'post');
-      // dispatch(addAuth(res.data.result));
+      message.success('Register successfully!');
+      navigate('/');
+
     } catch (error: any) {
       console.log(error);
       message.error(error.message)
     }
-    message.success('Register successfully!');
-    navigate('/');
     setIsLoading(false);
   };
 
