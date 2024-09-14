@@ -1,4 +1,4 @@
-import React from 'react'
+
 import HomeScreen from '../screens/HomeScreen'
 import { Layout } from 'antd'
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
@@ -12,8 +12,14 @@ const MainRouter = () => {
     <Layout>
       <SiderComponent />
       <Layout>
-        <HeaderComponent />
-        <Content>
+        <HeaderComponent  />
+        <Content className='container mt-2 mb-2 bg-white' style={
+          {
+            width: '96%',
+            
+          }
+          
+        }>
           <Routes>
             <Route path='/' element={<HomeScreen />}></Route>
             <Route path='/inventory' element={<InventoryScreen />}></Route>

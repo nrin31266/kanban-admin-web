@@ -5,10 +5,10 @@ import { colors } from "../configurations/configurations";
 
 function HeaderComponent() {
   return (
-    <div className="p-2 row bg-white" style={{}}>
+    <div className="p-2 ml-1 mr-1 row bg-white" style={{}}>
       <div className="col">
         <Input
-          placeholder="Search..."
+          placeholder="Search product, supplier, order"
           style={{
             borderRadius: 90,
             width: "100%",
