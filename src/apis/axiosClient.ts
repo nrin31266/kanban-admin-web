@@ -2,7 +2,7 @@ import axios from "axios";
 import queryString from "query-string";
 import { localDataNames } from "../constants/appInfos";
 
-const baseURL = `http://192.168.1.6:8888/api/v1`;
+const baseURL = `http://172.20.10.4:8888/api/v1`;
 
 export const getAuth = () => {
   const res = localStorage.getItem(localDataNames.authData);
@@ -17,14 +17,14 @@ const axiosClient = axios.create({
 
 axiosClient.interceptors.request.use(async (config: any) => {
   const accessToken = getAuth();
-
+  
   config.headers = {
-    Authorization: accessToken.token,
+    Authorization: accessToken.token? `Bearer ${accessToken.token}` : undefined,
     Accept: "application/json",
     ...config.headers,
   };
   if (config.data) {
-    // Thực hiện các hành động với config.data
+    
   }
   console.log(config);
   return config;

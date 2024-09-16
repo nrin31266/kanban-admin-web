@@ -1,14 +1,27 @@
-import { Avatar, Button, Form, Input, message, Modal, Select, Typography } from "antd";
+import {
+  Avatar,
+  Button,
+  Form,
+  Input,
+  message,
+  Modal,
+  Select,
+  Typography,
+} from "antd";
 import React, { useRef, useState } from "react";
-import { colors } from "../configurations/configurations";
+import { API, colors } from "../configurations/configurations";
 import { LuImagePlus } from "react-icons/lu";
 import BigDecimal from "js-big-decimal";
+import { uploadFile } from "../utils/uploadFile";
+import { replaceName } from "../utils/replaceName";
+import handleAPI from "../apis/handleAPI";
+import { SuppliersModel } from "../models/SuppliersModel";
 
 interface Props {
   visible: boolean;
   onClose: () => void;
-  onAddNew: (values: any) => void;
-  suppliers?: any;
+  onAddNew: (values: SuppliersModel) => void;
+  suppliers?: SuppliersModel;
 }
 
 const ToggleSuppliers = (props: Props) => {
@@ -22,26 +35,38 @@ const ToggleSuppliers = (props: Props) => {
   const inpRef = useRef<any>();
 
   const addNewSuppliers = async (values: any) => {
+    setIsLoading(true);
+
     const data: any = {};
 
-    for(const i in values){
+    for (const i in values) {
       data[i] = values[i] ?? "";
     }
 
-    data.price = values.price ? new BigDecimal(values.price).getValue() : new BigDecimal(0).getValue();
+    data.price = values.price
+      ? new BigDecimal(values.price).getValue()
+      : new BigDecimal(0).getValue();
 
-    data.talking = talking? 'true' : 'false';
+    data.talking = talking ? "true" : "false";
 
-    setIsLoading(true);
+    if (file) {
+      data.photoUrl = await uploadFile(file);
+    }
+    data.slug = replaceName(values.name);
+
+    data.categories = [];
+
     try {
-      console.log(data);
-    } catch (error:any) {
+      const res = await handleAPI(API.CREATE_SUPPLIERS, data, "post");
+      message.success("Created suppliers!");
+      onAddNew(res.data.result);
+      handleClose();
+    } catch (error: any) {
       console.log(error);
       message.error(error.message);
-    }finally{
+    } finally {
       setIsLoading(false);
     }
-
   };
 
   const handleClose = () => {
@@ -51,7 +76,7 @@ const ToggleSuppliers = (props: Props) => {
 
   return (
     <Modal
-      loading={isLoading}
+      closable={!isLoading}
       open={props.visible}
       onClose={handleClose}
       onCancel={handleClose}
@@ -59,6 +84,9 @@ const ToggleSuppliers = (props: Props) => {
       okText="Add suppliers"
       cancelText="Discard"
       onOk={() => form.submit()}
+      okButtonProps={{
+        loading: isLoading,
+      }}
     >
       <div className="d-none">
         <input
@@ -69,39 +97,40 @@ const ToggleSuppliers = (props: Props) => {
           accept="image/*"
         />
       </div>
-      <label
-        htmlFor="inpFile"
-        className="p-2 mb-4 row"
-      >
+      <label htmlFor="inpFile" className="p-2 mb-4 row">
         <div className="text-right col m-0">
-        {file ? (
-          <Avatar size={100} src={URL.createObjectURL(file)} 
-          style={{
-            border: "3px solid #E5E5E5",
-          }}/>
-        ) : (
-          <Avatar
-            size={100}
-            style={{
-              backgroundColor: "white",
-              border: "2px dashed grey",
-            }}
-          >
-            <LuImagePlus size={50} color={colors.grey600} />
-          </Avatar>
-        )}
+          {file ? (
+            <Avatar
+              size={100}
+              src={URL.createObjectURL(file)}
+              style={{
+                border: "3px solid #E5E5E5",
+              }}
+            />
+          ) : (
+            <Avatar
+              size={100}
+              style={{
+                backgroundColor: "white",
+                border: "2px dashed grey",
+              }}
+            >
+              <LuImagePlus size={50} color={colors.grey600} />
+            </Avatar>
+          )}
         </div>
         <div className="mt-2 col text-left m-0">
           <Paragraph className="text-muted m-0">Drag image here</Paragraph>
           <Paragraph className="text-muted m-0" style={{ marginBottom: "5px" }}>
             Or
           </Paragraph>
-          <Button  type="link" onClick={() => inpRef.current.click()}>
+          <Button type="link" onClick={() => inpRef.current.click()}>
             Browne image
           </Button>
         </div>
       </label>
       <Form
+        disabled={isLoading}
         onFinish={addNewSuppliers}
         layout="horizontal"
         form={form}

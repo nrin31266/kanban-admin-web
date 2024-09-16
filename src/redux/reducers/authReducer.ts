@@ -16,14 +16,14 @@ const authSlide = createSlice({
     },
     reducers: {
         addAuth: (state, action) => {
-            state.data = { token: action.payload.token }; // Giả sử action.payload có trường `token`
+            state.data = action.payload; 
             syncLocal(action.payload);
         },
         removeAuth: (state, _action) => {
 			state.data = initialState;
 			syncLocal({});
 		},
-		refreshtoken: (state, action) => {
+		refreshToken: (state, action) => {
 			state.data.token = action.payload;
             syncLocal(action.payload);
 		},
@@ -31,7 +31,7 @@ const authSlide = createSlice({
 });
 
 export const authReducer = authSlide.reducer;
-export const { addAuth, removeAuth, refreshtoken } = authSlide.actions;
+export const { addAuth, removeAuth, refreshToken } = authSlide.actions;
 
 export const authSelector = (state: any) => state.authReducer.data;
 

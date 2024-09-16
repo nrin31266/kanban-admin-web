@@ -5,13 +5,14 @@ import { MdOutlineFilterList } from "react-icons/md";
 import { MdOutlineLibraryAdd } from "react-icons/md";
 import { RxDownload } from "react-icons/rx";
 import { ToggleSuppliers } from '../modals';
+import { SuppliersModel } from '../models/SuppliersModel';
 const {Title} = Typography;
 
 const SuppliersScreen = () => {
 
   const [isVisibleToggleSupplies, setIsVisibleToggleSupplies] = useState(false);
   
-  const columns: ColumnProps<any>[] = [
+  const columns: ColumnProps<SuppliersModel>[] = [
 
   ];
 
@@ -40,7 +41,6 @@ const SuppliersScreen = () => {
         visible={isVisibleToggleSupplies} 
         onClose={() => setIsVisibleToggleSupplies(false)}
         onAddNew={val => console.log(val)}
-        suppliers={{}}
       />
     </div>
   )

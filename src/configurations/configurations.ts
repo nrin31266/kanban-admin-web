@@ -3,7 +3,8 @@ export const API = {
   LOGOUT: "/identity/auth/logout",
   LOGIN_WITH_GOOGLE: "/identity/auth/outbound/google-login",
   SIGNUP: "/identity/users/create",
-  REFESH_TOKEN: "/identity/auth/refresh",
+  REFRESH_TOKEN: "/identity/auth/refresh",
+  CREATE_SUPPLIERS: "/kanban/suppliers/create"
 };
 
 export const appInfos = {

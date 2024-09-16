@@ -1,7 +1,7 @@
 import { Button, message } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { addAuth, authSelector, AuthState, refreshtoken, removeAuth } from '../redux/reducers/authReducer';
+import { addAuth, authSelector, AuthState, refreshToken, removeAuth } from '../redux/reducers/authReducer';
 import handleAPI from '../apis/handleAPI';
 import { getAuth } from '../apis/axiosClient';
 import { API } from '../configurations/configurations';
@@ -11,28 +11,6 @@ const HomeScreen = () => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const refreshAuthToken  = async () =>{
-      
-      const auth = getAuth();
-      if (auth){
-        try {
-          const res = await handleAPI(API.REFESH_TOKEN, getAuth(), 'post');
-          if(res.data.result.token!==auth.token){
-            console.log(res.data);
-            dispatch(refreshtoken(res.data.result));
-          }
-        } catch (error:any) {
-          dispatch(removeAuth({}));
-          console.log(error);
-          message.error(error.message);
-        }
-      }
-      
-    }
-
-    refreshAuthToken ();
-  }, [dispatch]);
 
   useEffect(() => {
     
