@@ -2,7 +2,7 @@
 import HomeScreen from '../screens/HomeScreen'
 import { Layout } from 'antd'
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { InventoryScreen, ManageStoreScreen, OrdersScreen, ReportScreen, SuppliersScreen } from '../screens';
+import { InventoryScreen, ManageStoreScreen, OrdersScreen, ReportScreen, SupplierScreen } from '../screens';
 import { HeaderComponent, SiderComponent } from '../components';
 const {Content, Footer, Header, Sider} = Layout;
 
@@ -24,7 +24,7 @@ const MainRouter = () => {
             <Route path='/' element={<HomeScreen />}></Route>
             <Route path='/inventory' element={<InventoryScreen />}></Route>
             <Route path='/report' element={<ReportScreen />}></Route>
-            <Route path='/suppliers' element={<SuppliersScreen />}></Route>
+            <Route path='/suppliers' element={<SupplierScreen />}></Route>
             <Route path='/orders' element={<OrdersScreen />}></Route>
             <Route path='/manage-store' element={<ManageStoreScreen />}></Route>
           </Routes>

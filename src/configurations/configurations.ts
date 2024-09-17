@@ -4,7 +4,11 @@ export const API = {
   LOGIN_WITH_GOOGLE: "/identity/auth/outbound/google-login",
   SIGNUP: "/identity/users/create",
   REFRESH_TOKEN: "/identity/auth/refresh",
-  CREATE_SUPPLIERS: "/kanban/suppliers/create"
+  VERIFY_TOKEN:'identity/auth/introspect',
+  CREATE_SUPPLIER: "/kanban/suppliers/create",
+  GET_SUPPLIERS: "/kanban/suppliers",
+  UPDATE_SUPPLIER: (suppliersId:string) => `/kanban/suppliers/${suppliersId}`,
+  DELETE_SUPPLIER: (suppliersId:string) => `/kanban/suppliers?suppliersId=${suppliersId}`
 };
 
 export const appInfos = {

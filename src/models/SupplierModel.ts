@@ -1,4 +1,4 @@
-export interface SuppliersModel {
+export interface SupplierModel {
     id: string
     photoUrl: string
     slug: string
@@ -8,6 +8,8 @@ export interface SuppliersModel {
     price: number
     contact: string
     talking: boolean
+    onTheWay: number
+    email: string
     createdAt: string
     updatedAt: string
   }

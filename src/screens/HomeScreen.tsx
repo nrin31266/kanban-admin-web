@@ -1,10 +1,10 @@
-import { Button, message } from 'antd'
-import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { addAuth, authSelector, AuthState, refreshToken, removeAuth } from '../redux/reducers/authReducer';
-import handleAPI from '../apis/handleAPI';
+import { Button, message } from 'antd';
+import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { getAuth } from '../apis/axiosClient';
+import handleAPI from '../apis/handleAPI';
 import { API } from '../configurations/configurations';
+import { refreshToken, removeAuth } from '../redux/reducers/authReducer';
 
 
 const HomeScreen = () => {
@@ -27,12 +27,42 @@ const HomeScreen = () => {
     } catch (error: any) {
       dispatch(removeAuth({}));
       console.log(error);
-      message.error(error.message);
     }finally{
-      message.destroy('Signed out successfully!');
+      message.success('Signed out successfully!');
       setIsLoading(false);
     }
   };
+
+  const verifyToken = async () => {
+    setIsLoading(true);
+    try {
+      const dataToken = getAuth();
+      const res = await handleAPI(API.VERIFY_TOKEN, dataToken, "post");
+      console.log(res.data);
+    } catch (error: any) {
+      console.log(error);
+      message.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const handleRefreshToken = async () => {
+    setIsLoading(true);
+    try {
+      const dataToken = getAuth();
+      const res = await handleAPI(API.REFRESH_TOKEN, dataToken, "post");
+      if (res.data.result.token){
+        dispatch(refreshToken(res.data.result.token));
+        message.success("Refreshed token!");
+      }
+    } catch (error: any) {
+      console.log(error);
+      message.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
 
   
 
@@ -44,6 +74,14 @@ const HomeScreen = () => {
         loading={isLoading}
         onClick={handleLogout}
       >Logout</Button>
+      <Button
+        loading={isLoading}
+        onClick={verifyToken}
+      >verify</Button>
+      <Button
+        loading={isLoading}
+        onClick={handleRefreshToken}
+      >refreshToken</Button>
     </div>
   )
 }

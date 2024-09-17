@@ -9,7 +9,7 @@ const initialState : AuthState = {
     token: '',
 };
 
-const authSlide = createSlice({
+const authSlice = createSlice({
     name: 'auth',
     initialState: {
         data: initialState 
@@ -25,13 +25,13 @@ const authSlide = createSlice({
 		},
 		refreshToken: (state, action) => {
 			state.data.token = action.payload;
-            syncLocal(action.payload);
+            syncLocal({ ...state.data, token: action.payload });
 		},
     }
 });
 
-export const authReducer = authSlide.reducer;
-export const { addAuth, removeAuth, refreshToken } = authSlide.actions;
+export const authReducer = authSlice.reducer;
+export const { addAuth, removeAuth, refreshToken } = authSlice.actions;
 
 export const authSelector = (state: any) => state.authReducer.data;
 

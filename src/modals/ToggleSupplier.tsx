@@ -8,58 +8,64 @@ import {
   Select,
   Typography,
 } from "antd";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { API, colors } from "../configurations/configurations";
 import { LuImagePlus } from "react-icons/lu";
 import BigDecimal from "js-big-decimal";
 import { uploadFile } from "../utils/uploadFile";
 import { replaceName } from "../utils/replaceName";
 import handleAPI from "../apis/handleAPI";
-import { SuppliersModel } from "../models/SuppliersModel";
+import { SupplierModel } from "../models/SupplierModel";
 
 interface Props {
   visible: boolean;
   onClose: () => void;
-  onAddNew: (values: SuppliersModel) => void;
-  suppliers?: SuppliersModel;
+  onAddNew: (values: SupplierModel) => void;
+  supplier?: SupplierModel;
 }
 
-const ToggleSuppliers = (props: Props) => {
-  const { visible, onClose, onAddNew, suppliers } = props;
+const ToggleSupplier = (props: Props) => {
+  const { visible, onClose, onAddNew, supplier } = props;
   const [isLoading, setIsLoading] = useState(false);
-  const [talking, setTalking] = useState<number>(0);
+  const [talking, setTalking] = useState<number>(1);
   const [file, setFile] = useState<any>();
   const { Paragraph } = Typography;
-
   const [form] = Form.useForm();
   const inpRef = useRef<any>();
 
-  const addNewSuppliers = async (values: any) => {
+  useEffect(() => {
+    if (supplier) {
+      form.setFieldsValue(supplier);
+      setTalking(supplier.talking ? 1 : 2);
+    }
+  }, [supplier]);
+
+  const handleSubmitSuppliers = async (values: any) => {
     setIsLoading(true);
-
     const data: any = {};
-
     for (const i in values) {
       data[i] = values[i] ?? "";
     }
-
     data.price = values.price
       ? new BigDecimal(values.price).getValue()
       : new BigDecimal(0).getValue();
-
-    data.talking = talking ? "true" : "false";
-
+    data.talking = talking == 1 ? "true" : "false";
     if (file) {
       data.photoUrl = await uploadFile(file);
+    }else if(supplier?.photoUrl){
+      data.photoUrl = supplier.photoUrl;
     }
     data.slug = replaceName(values.name);
-
     data.categories = [];
-
+    console.log(data);
     try {
-      const res = await handleAPI(API.CREATE_SUPPLIERS, data, "post");
-      message.success("Created suppliers!");
-      onAddNew(res.data.result);
+      const res = await handleAPI(
+        supplier ? API.UPDATE_SUPPLIER(supplier.id) : API.CREATE_SUPPLIER,
+        data,
+        supplier ? "put" : "post"
+      );
+      message.success(res.data.message);
+      !supplier && onAddNew(res.data.result);
       handleClose();
     } catch (error: any) {
       console.log(error);
@@ -71,6 +77,8 @@ const ToggleSuppliers = (props: Props) => {
 
   const handleClose = () => {
     form.resetFields();
+    setFile(undefined);
+    setTalking(1);
     onClose();
   };
 
@@ -80,8 +88,8 @@ const ToggleSuppliers = (props: Props) => {
       open={props.visible}
       onClose={handleClose}
       onCancel={handleClose}
-      title="Add suppliers"
-      okText="Add suppliers"
+      title={supplier ? "Update supplier" : "Add supplier"}
+      okText={supplier ? "Update" : "Add"}
       cancelText="Discard"
       onOk={() => form.submit()}
       okButtonProps={{
@@ -103,6 +111,14 @@ const ToggleSuppliers = (props: Props) => {
             <Avatar
               size={100}
               src={URL.createObjectURL(file)}
+              style={{
+                border: "3px solid #E5E5E5",
+              }}
+            />
+          ) : supplier?.photoUrl ? (
+            <Avatar
+              size={100}
+              src={supplier.photoUrl}
               style={{
                 border: "3px solid #E5E5E5",
               }}
@@ -131,7 +147,7 @@ const ToggleSuppliers = (props: Props) => {
       </label>
       <Form
         disabled={isLoading}
-        onFinish={addNewSuppliers}
+        onFinish={handleSubmitSuppliers}
         layout="horizontal"
         form={form}
         labelCol={{ span: 8 }}
@@ -144,11 +160,11 @@ const ToggleSuppliers = (props: Props) => {
           rules={[
             {
               required: true,
-              message: "The suppliers name must not be left blank!",
+              message: "Enter name!",
             },
           ]}
         >
-          <Input placeholder="Enter suppliers name" allowClear={true} />
+          <Input placeholder="Enter supplier name" allowClear={true} />
         </Form.Item>
         <Form.Item name={"product"} label={"Product name"}>
           <Input placeholder="Enter product" allowClear={true} />
@@ -163,12 +179,34 @@ const ToggleSuppliers = (props: Props) => {
             type="number"
           />
         </Form.Item>
-        <Form.Item name={"contact"} label={"Contact Number"}>
+        <Form.Item
+          name={"contact"}
+          label={"Contact Number"}
+          rules={[
+            {
+              required: true,
+              message: "Enter contact number!",
+            },
+          ]}
+        >
           <Input
             placeholder="Enter supplier contact number"
             allowClear={true}
           />
         </Form.Item>
+        <Form.Item name={"email"} label={"Email"} rules={[
+            {
+              required: true,
+              message: "Enter email!",
+            },
+          ]}>
+          <Input placeholder="Enter email" allowClear={true} type="email"/>
+        </Form.Item>
+        
+        <Form.Item name={"onTheWay"} label={"On the way" } >
+          <Input defaultValue={0} placeholder="" type="number" />
+        </Form.Item>
+        
         <Form.Item label={"Talking return type?"}>
           <Button
             className="mr-2"
@@ -191,4 +229,4 @@ const ToggleSuppliers = (props: Props) => {
   );
 };
 
-export default ToggleSuppliers;
+export default ToggleSupplier;

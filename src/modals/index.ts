@@ -1,5 +1,5 @@
 
-import ToggleSuppliers from './ToggleSuppliers';
+import ToggleSupplier from './ToggleSupplier';
 export {
-    ToggleSuppliers
+    ToggleSupplier
 };
