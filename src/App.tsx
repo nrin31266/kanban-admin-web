@@ -3,12 +3,11 @@
 import { ConfigProvider, message } from 'antd';
 import Routers from './routers/Routers';
 import { Provider } from 'react-redux';
-
-import './App.css';
 import store from './redux/store';
+import './App.css';
 
 message.config({
-	top: 30,
+	top: 20,
 	duration: 2,
 	maxCount: 3,
 	rtl: true,

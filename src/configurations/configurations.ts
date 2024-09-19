@@ -6,9 +6,11 @@ export const API = {
   REFRESH_TOKEN: "/identity/auth/refresh",
   VERIFY_TOKEN:'identity/auth/introspect',
   CREATE_SUPPLIER: "/kanban/suppliers/create",
-  GET_SUPPLIERS: "/kanban/suppliers",
+  GET_SUPPLIERS: (page:number,size: number) => `/kanban/suppliers?page=${page}&size=${size}`,
   UPDATE_SUPPLIER: (suppliersId:string) => `/kanban/suppliers/${suppliersId}`,
-  DELETE_SUPPLIER: (suppliersId:string) => `/kanban/suppliers?suppliersId=${suppliersId}`
+  DELETE_SUPPLIER: (suppliersId:string) => `/kanban/suppliers?suppliersId=${suppliersId}`,
+  GET_FORM: "/kanban/suppliers/form",
+  
 };
 
 export const appInfos = {

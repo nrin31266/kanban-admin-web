@@ -1,82 +1,63 @@
 import { Button, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { getAuth } from '../apis/axiosClient';
+import { getAuth, getRefreshToken, verifyToken } from '../apis/axiosClient';
 import handleAPI from '../apis/handleAPI';
 import { API } from '../configurations/configurations';
 import { refreshToken, removeAuth } from '../redux/reducers/authReducer';
+import { demoData } from '../data/demoData';
+import { replaceName } from '../utils/replaceName';
+import { useNavigate } from 'react-router-dom';
 
 
 const HomeScreen = () => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
 
   useEffect(() => {
     
   }, []);
 
-  const handleLogout = async () => {
+  const handleVerifyToken =async ()=>{
     setIsLoading(true);
     try {
-      const dataToken = getAuth();
-      if (dataToken) {
-        await handleAPI(API.LOGOUT, dataToken, 'post');
-      }
-      dispatch(removeAuth({}));
-    } catch (error: any) {
-      dispatch(removeAuth({}));
+      await verifyToken();
+    } catch (error) {
       console.log(error);
     }finally{
-      message.success('Signed out successfully!');
       setIsLoading(false);
     }
   };
 
-  const verifyToken = async () => {
+const handleRefreshToken =async ()=>{
     setIsLoading(true);
     try {
-      const dataToken = getAuth();
-      const res = await handleAPI(API.VERIFY_TOKEN, dataToken, "post");
-      console.log(res.data);
-    } catch (error: any) {
-      console.log(error);
-      message.error(error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  const handleRefreshToken = async () => {
-    setIsLoading(true);
-    try {
-      const dataToken = getAuth();
-      const res = await handleAPI(API.REFRESH_TOKEN, dataToken, "post");
-      if (res.data.result.token){
-        dispatch(refreshToken(res.data.result.token));
-        message.success("Refreshed token!");
+      const res:any = await getRefreshToken();
+      if(res){
+        if(res !== true){
+          dispatch(refreshToken(res));
+        }
+      }else{
+        dispatch(removeAuth({}))
+        localStorage.clear();
+        navigate('/');
+        console.log(res);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
-      message.error(error.message);
-    } finally {
+    } finally{
       setIsLoading(false);
     }
   };
 
-
-  
-
-  
 
   return (
     <div>
       <Button
         loading={isLoading}
-        onClick={handleLogout}
-      >Logout</Button>
-      <Button
-        loading={isLoading}
-        onClick={verifyToken}
+        onClick={handleVerifyToken}
       >verify</Button>
       <Button
         loading={isLoading}

@@ -1,13 +1,4 @@
-import {
-  Avatar,
-  Button,
-  Form,
-  Input,
-  message,
-  Modal,
-  Select,
-  Typography,
-} from "antd";
+import { Avatar, Button, Form, Input, message, Modal, Select, Typography } from "antd";
 import React, { useEffect, useRef, useState } from "react";
 import { API, colors } from "../configurations/configurations";
 import { LuImagePlus } from "react-icons/lu";
@@ -16,29 +7,48 @@ import { uploadFile } from "../utils/uploadFile";
 import { replaceName } from "../utils/replaceName";
 import handleAPI from "../apis/handleAPI";
 import { SupplierModel } from "../models/SupplierModel";
+import FormItem from "../components/FormItem";
+import { FormModel } from "../models/FormModel";
 
 interface Props {
   visible: boolean;
   onClose: () => void;
-  onAddNew: (values: SupplierModel) => void;
+  onAddNew:  () => void;
   supplier?: SupplierModel;
 }
 
 const ToggleSupplier = (props: Props) => {
   const { visible, onClose, onAddNew, supplier } = props;
   const [isLoading, setIsLoading] = useState(false);
-  const [talking, setTalking] = useState<number>(1);
   const [file, setFile] = useState<any>();
   const { Paragraph } = Typography;
+  const [formData, setFormData] = useState<FormModel>();
   const [form] = Form.useForm();
   const inpRef = useRef<any>();
+  const [isGetting, setIsGetting] = useState(false);
+
+  useEffect(() => {
+    getFormData();
+  }, []);
 
   useEffect(() => {
     if (supplier) {
       form.setFieldsValue(supplier);
-      setTalking(supplier.talking ? 1 : 2);
     }
   }, [supplier]);
+
+  const getFormData = async () => {
+    setIsGetting(true);
+    try {
+      const res = await handleAPI(API.GET_FORM);
+      res.data.result && setFormData(res.data.result);
+    } catch (error: any) {
+      message.error(error.message)
+      console.log(error);
+    } finally {
+      setIsGetting(false);
+    }
+  };
 
   const handleSubmitSuppliers = async (values: any) => {
     setIsLoading(true);
@@ -49,13 +59,16 @@ const ToggleSupplier = (props: Props) => {
     data.price = values.price
       ? new BigDecimal(values.price).getValue()
       : new BigDecimal(0).getValue();
-    data.talking = talking == 1 ? "true" : "false";
+    
     if (file) {
       data.photoUrl = await uploadFile(file);
-    }else if(supplier?.photoUrl){
+    } else if (supplier?.photoUrl) {
       data.photoUrl = supplier.photoUrl;
     }
     data.slug = replaceName(values.name);
+    data.talking = data.talking ? true : false;
+    
+
     data.categories = [];
     console.log(data);
     try {
@@ -65,7 +78,9 @@ const ToggleSupplier = (props: Props) => {
         supplier ? "put" : "post"
       );
       message.success(res.data.message);
-      !supplier && onAddNew(res.data.result);
+      if (!supplier) {
+        onAddNew();
+      }
       handleClose();
     } catch (error: any) {
       console.log(error);
@@ -78,12 +93,12 @@ const ToggleSupplier = (props: Props) => {
   const handleClose = () => {
     form.resetFields();
     setFile(undefined);
-    setTalking(1);
     onClose();
   };
 
   return (
     <Modal
+      loading={isGetting}
       closable={!isLoading}
       open={props.visible}
       onClose={handleClose}
@@ -145,86 +160,23 @@ const ToggleSupplier = (props: Props) => {
           </Button>
         </div>
       </label>
-      <Form
-        disabled={isLoading}
-        onFinish={handleSubmitSuppliers}
-        layout="horizontal"
-        form={form}
-        labelCol={{ span: 8 }}
-        wrapperCol={{ span: 16 }}
-        size="large"
-      >
-        <Form.Item
-          name={"name"}
-          label={"Suppliers name"}
-          rules={[
-            {
-              required: true,
-              message: "Enter name!",
-            },
-          ]}
-        >
-          <Input placeholder="Enter supplier name" allowClear={true} />
-        </Form.Item>
-        <Form.Item name={"product"} label={"Product name"}>
-          <Input placeholder="Enter product" allowClear={true} />
-        </Form.Item>
-        <Form.Item name={"categories"} label={"Category"}>
-          <Select options={[]} placeholder="Select product category"></Select>
-        </Form.Item>
-        <Form.Item name={"price"} label={"Buying Price"}>
-          <Input
-            placeholder="Enter buying price"
-            allowClear={true}
-            type="number"
-          />
-        </Form.Item>
-        <Form.Item
-          name={"contact"}
-          label={"Contact Number"}
-          rules={[
-            {
-              required: true,
-              message: "Enter contact number!",
-            },
-          ]}
-        >
-          <Input
-            placeholder="Enter supplier contact number"
-            allowClear={true}
-          />
-        </Form.Item>
-        <Form.Item name={"email"} label={"Email"} rules={[
-            {
-              required: true,
-              message: "Enter email!",
-            },
-          ]}>
-          <Input placeholder="Enter email" allowClear={true} type="email"/>
-        </Form.Item>
+
+      {formData && (
+        <Form
         
-        <Form.Item name={"onTheWay"} label={"On the way" } >
-          <Input defaultValue={0} placeholder="" type="number" />
-        </Form.Item>
-        
-        <Form.Item label={"Talking return type?"}>
-          <Button
-            className="mr-2"
-            onClick={() => setTalking(1)}
-            type={talking == 1 ? "primary" : "default"}
-            style={{}}
-          >
-            Talking return
-          </Button>
-          <Button
-            onClick={() => setTalking(2)}
-            type={talking == 2 ? "primary" : "default"}
-            style={{}}
-          >
-            Not talking return
-          </Button>
-        </Form.Item>
-      </Form>
+          disabled={isLoading}
+          onFinish={handleSubmitSuppliers}
+          layout={formData.layout}
+          form={form}
+          labelCol={{ span: formData.labelCol }}
+          wrapperCol={{ span: formData.wrapperCol }}
+          size="large"
+        >
+          {formData.formItems.map((item) => (
+              <FormItem item={item}/>
+            ))}
+        </Form>
+      )}
     </Modal>
   );
 };

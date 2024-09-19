@@ -10,14 +10,13 @@ import { API } from "../../../configurations/configurations";
 const provider = new GoogleAuthProvider();
 provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
 provider.setCustomParameters({
-  prompt: 'select_account' // Buộc Google hiển thị lựa chọn tài khoản
+  prompt: 'select_account' 
 });
 
 const SocialLogin = () => {
   const [isLoading, setIsLoading] =useState(false);
-
   const dispatch = useDispatch();
-  const api = '/kanban/auth/outbound/google-login';
+  
   const handleLoginWithGoogle = async() =>{
     setIsLoading(true);
     try {
@@ -29,8 +28,7 @@ const SocialLogin = () => {
         const data = {
             idToken: idToken,
         };
-        const res = await handleAPI(API.LOGIN_WITH_GOOGLE, data, 'post'); 
-        // Disconnect firebase client
+        const res = await handleAPI(API.LOGIN_WITH_GOOGLE, data, 'post');
         await signOut(auth);
         dispatch(addAuth(res.data.result));
         message.success('Login with google successfully!');
