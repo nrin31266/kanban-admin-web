@@ -1,70 +1,74 @@
-import { Button, message } from 'antd';
-import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { getAuth, getRefreshToken, verifyToken } from '../apis/axiosClient';
-import handleAPI from '../apis/handleAPI';
-import { API } from '../configurations/configurations';
-import { refreshToken, removeAuth } from '../redux/reducers/authReducer';
-import { demoData } from '../data/demoData';
-import { replaceName } from '../utils/replaceName';
-import { useNavigate } from 'react-router-dom';
-
+import { Button, message } from "antd";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { getAuth, getRefreshToken, verifyToken } from "../apis/axiosClient";
+import handleAPI from "../apis/handleAPI";
+import { API } from "../configurations/configurations";
+import { refreshToken, removeAuth } from "../redux/reducers/authReducer";
+import { demoData } from "../data/demoData";
+import { replaceName } from "../utils/replaceName";
+import { useNavigate } from "react-router-dom";
+import { Resizable } from "re-resizable";
 
 const HomeScreen = () => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(() => {}, []);
 
-  useEffect(() => {
-    
-  }, []);
-
-  const handleVerifyToken =async ()=>{
+  const handleVerifyToken = async () => {
     setIsLoading(true);
     try {
       await verifyToken();
     } catch (error) {
       console.log(error);
-    }finally{
+    } finally {
       setIsLoading(false);
     }
   };
 
-const handleRefreshToken =async ()=>{
+  const handleRefreshToken = async () => {
     setIsLoading(true);
     try {
-      const res:any = await getRefreshToken();
-      if(res){
-        if(res !== true){
+      const res: any = await getRefreshToken();
+      if (res) {
+        if (res !== true) {
           dispatch(refreshToken(res));
         }
-      }else{
-        dispatch(removeAuth({}))
+      } else {
+        dispatch(removeAuth({}));
         localStorage.clear();
-        navigate('/');
+        navigate("/");
         console.log(res);
       }
     } catch (error) {
       console.log(error);
-    } finally{
+    } finally {
       setIsLoading(false);
     }
   };
 
-
   return (
     <div>
-      <Button
-        loading={isLoading}
-        onClick={handleVerifyToken}
-      >verify</Button>
-      <Button
-        loading={isLoading}
-        onClick={handleRefreshToken}
-      >refreshToken</Button>
+      <Resizable
+        style={{backgroundColor: 'red'}}
+        defaultSize={{
+          width: 320,
+          height: 200,
+        }
+      }
+      >
+        Sample with default size
+      </Resizable>
+      <Button loading={isLoading} onClick={handleVerifyToken}>
+        verify
+      </Button>
+      <Button loading={isLoading} onClick={handleRefreshToken}>
+        refreshToken
+      </Button>
     </div>
-  )
-}
+  );
+};
 
-export default HomeScreen
+export default HomeScreen;

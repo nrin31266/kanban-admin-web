@@ -31,6 +31,7 @@ const authSlice = createSlice({
 });
 
 export const authReducer = authSlice.reducer;
+
 export const { addAuth, removeAuth, refreshToken } = authSlice.actions;
 
 export const authSelector = (state: any) => state.authReducer.data;

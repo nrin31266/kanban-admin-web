@@ -4,7 +4,7 @@ import { localDataNames } from "../constants/appInfos";
 import handleAPI from "./handleAPI";
 import { API } from "../configurations/configurations";
 
-const baseURL = `http://172.20.10.4:8888/api/v1`;
+const baseURL = `http://localhost:8888/api/v1`;
 
 // let isRefreshing = false;
 // let refreshSubscribers: Array<(token: string) => void> = []; 

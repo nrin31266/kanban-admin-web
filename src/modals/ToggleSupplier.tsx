@@ -68,9 +68,8 @@ const ToggleSupplier = (props: Props) => {
     data.slug = replaceName(values.name);
     data.talking = data.talking ? true : false;
     
-
     data.categories = [];
-    console.log(data);
+
     try {
       const res = await handleAPI(
         supplier ? API.UPDATE_SUPPLIER(supplier.id) : API.CREATE_SUPPLIER,

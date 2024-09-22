@@ -10,7 +10,7 @@ export interface FormModel {
 
 export interface FormItemsModel {
   key: string;
-  value: string;
+  value: any;
   label: string;
   placeholder: string;
   type: 'default' | 'select' | 'number' | 'email' | 'tel' |'file' | 'check-box';
@@ -19,6 +19,7 @@ export interface FormItemsModel {
   message: string;
   defaultValue: string;
   checked: boolean;
+  displayLength: number
 }
 export interface SelectModel {
     label: string;

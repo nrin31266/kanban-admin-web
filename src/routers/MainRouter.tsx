@@ -18,14 +18,14 @@ const MainRouter = () => {
         <Affix offsetTop={0}>
           <SiderComponent />
         </Affix>
-        <Layout>
+        <Layout style={{backgroundColor: '#DAE5E6'}}>
           <Affix offsetTop={0}>
             <HeaderComponent />
           </Affix>
           <Content
-            className="container mt-2 mb-2 bg-white"
+            className="container-fluid mt-2 mb-2 bg-white"
             style={{
-              width: "96%",
+              width: "99%",
             }}
           >
             <Routes>
@@ -40,7 +40,7 @@ const MainRouter = () => {
               ></Route>
             </Routes>
           </Content>
-          <Footer />
+          {/* <Footer /> */}
         </Layout>
       </Layout>
     </BrowserRouter>
