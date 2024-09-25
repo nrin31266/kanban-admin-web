@@ -18,11 +18,18 @@ const SiderComponent = () => {
       key: "dashboard",
       label: <Link to={"/"}>Dashboard</Link>,
       icon: <LuHome size={20} />,
+      
     },
     {
       key: "inventory",
       label: <Link to={"/inventory"}>Inventory</Link>,
       icon: <MdOutlineInventory2 size={20} />,
+      children: [
+        {
+          key: 'add-new',
+          label: <Link to={'/inventory/add-product'}>Add product</Link>
+        }
+      ]
     },
     {
       key: "report",
@@ -51,7 +58,7 @@ const SiderComponent = () => {
         height: '100vh',
         
     }}
-    width={280}
+    width={200}
     >
       <div className=" p-3 d-flex">
         <img
@@ -70,7 +77,7 @@ const SiderComponent = () => {
           }}
         >{appInfos.title}</Text>
       </div>
-      <Menu items={items} theme="light"></Menu>
+      <Menu mode="inline"  items={items} theme="light"></Menu>
     </Sider>
   );
 };

@@ -22,5 +22,6 @@ export const appInfos = {
 
 export const colors = {
   primary500: '#1570EF',
-  grey600: '5D6679'
+  grey600: '#5D6679',
+  grey800: '#383E49',
 };

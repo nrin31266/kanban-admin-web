@@ -40,3 +40,16 @@
 .ant-menu-title-content a{
   text-decoration: none;
 }
+
+.item-wrapping{
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  padding: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.ant-card-body{
+  padding: 8px 10px !important;
+}

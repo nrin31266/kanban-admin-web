@@ -9,6 +9,7 @@ import {
   SupplierScreen,
 } from "../screens";
 import { HeaderComponent, SiderComponent } from "../components";
+import AddProduct from "../screens/inventories/AddProduct";
 const { Content, Footer, Header, Sider } = Layout;
 
 const MainRouter = () => {
@@ -18,7 +19,7 @@ const MainRouter = () => {
         <Affix offsetTop={0}>
           <SiderComponent />
         </Affix>
-        <Layout style={{backgroundColor: '#DAE5E6'}}>
+        <Layout style={{backgroundColor: '#ECECEC'}}>
           <Affix offsetTop={0}>
             <HeaderComponent />
           </Affix>
@@ -26,11 +27,15 @@ const MainRouter = () => {
             className="container-fluid mt-2 mb-2 bg-white"
             style={{
               width: "99%",
+              backgroundColor: '#ECECEC'
             }}
           >
             <Routes>
               <Route path="/" element={<HomeScreen />}></Route>
-              <Route path="/inventory" element={<InventoryScreen />}></Route>
+              <Route>
+                <Route path="/inventory" element={<InventoryScreen />}></Route>
+                <Route path="/inventory/add-product" element={<AddProduct />}></Route>
+              </Route>
               <Route path="/report" element={<ReportScreen />}></Route>
               <Route path="/suppliers" element={<SupplierScreen />}></Route>
               <Route path="/orders" element={<OrdersScreen />}></Route>

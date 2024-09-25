@@ -13,7 +13,7 @@ export interface FormItemsModel {
   value: any;
   label: string;
   placeholder: string;
-  type: 'default' | 'select' | 'number' | 'email' | 'tel' |'file' | 'check-box';
+  type: 'default' | 'select' | 'number' | 'email' | 'tel' |'file' | 'check-box' | 'text-area';
   lockupItem: SelectModel[];
   required: boolean;
   message: string;

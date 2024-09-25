@@ -138,6 +138,9 @@ const TableComponent = (props: Props) => {
   return (
     <>
       <Table
+        style={{
+          padding: '5px 0px'
+        }}
         components={{
           header: {
             cell: RenderTitle,
@@ -162,7 +165,7 @@ const TableComponent = (props: Props) => {
           },
         }}
         scroll={{
-          y: scrollHeight ?? "calc(100vh - 240px)",
+          y: scrollHeight ?? "calc(100vh - 250px)",
         }}
         bordered
         rowKey="key"
@@ -190,8 +193,8 @@ const TableComponent = (props: Props) => {
               </Space>
             </div>
           </div>
-          
-        )}/>
+        )
+        }/>
       <ModalExportData 
         visible={isVisibleModalExport} 
         onClose={()=>setIsVisibleModalExport(false)} 

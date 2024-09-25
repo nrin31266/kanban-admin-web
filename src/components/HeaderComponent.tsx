@@ -5,9 +5,9 @@ import { TbMessageExclamation } from "react-icons/tb";
 import { API, colors } from "../configurations/configurations";
 import handleAPI from "../apis/handleAPI";
 import { useDispatch } from 'react-redux';
-import { removeAuth } from "../redux/reducers/authReducer";
+import { refreshToken, removeAuth } from "../redux/reducers/authReducer";
 import { useNavigate } from "react-router-dom";
-import { getAuth } from "../apis/axiosClient";
+import { getAuth, getRefreshToken, verifyToken } from "../apis/axiosClient";
 const { Title } = Typography;
 
 function HeaderComponent() {
@@ -35,8 +35,55 @@ function HeaderComponent() {
     }
   };
 
+  const handleVerifyToken = async () => {
+    setIsLoading(true);
+    try {
+      await verifyToken();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRefreshToken = async () => {
+    setIsLoading(true);
+    try {
+      const res: any = await getRefreshToken();
+      if (res) {
+        if (res !== true) {
+          dispatch(refreshToken(res));
+        }
+      } else {
+        dispatch(removeAuth({}));
+        localStorage.clear();
+        navigate("/");
+        console.log(res);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
   const items: MenuProps['items'] = [
 		{
+			key: 'verify-token',
+			label: 'Verify token',
+			onClick: async () => {
+				handleVerifyToken();
+			},
+		},
+    {
+			key: 'refresh-token',
+			label: 'Refresh token',
+			onClick: async () => {
+				handleRefreshToken();
+			},
+		},
+    {
 			key: 'logout',
 			label: 'Log out',
 			onClick: async () => {
@@ -58,7 +105,7 @@ function HeaderComponent() {
             width: "100%",
           }}
           size="large"
-          prefix={<MdOutlineManageSearch className="text-muted" size={20} />}
+          prefix={<Button type="text"><MdOutlineManageSearch className="text-muted" size={20} /></Button>}
         />
       </div>
       <div className="col text-right">

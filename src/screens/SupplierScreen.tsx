@@ -8,7 +8,6 @@ import { FormModel } from "./../models/FormModel";
 import TableComponent from "../components/TableComponent";
 import { FiUserX } from "react-icons/fi";
 import { FiEdit3 } from "react-icons/fi";
-import { useNavigate, useSearchParams } from "react-router-dom";
 const { confirm } = Modal;
 
 const SupplierScreen = () => {
