@@ -10,7 +10,8 @@ export const API = {
   GET_SUPPLIERS: (page:number|string,size: number|string) => `/kanban/suppliers?page=${page}&size=${size}`,
   UPDATE_SUPPLIER: (suppliersId:string) => `/kanban/suppliers/${suppliersId}`,
   DELETE_SUPPLIER: (suppliersId:string) => `/kanban/suppliers?suppliersId=${suppliersId}`,
-  GET_FORM: "/kanban/suppliers/form",
+  FORM_SUPPLIERS: "/kanban/suppliers/form",
+  CATEGORY: "/kanban/categories",
   
 };
 

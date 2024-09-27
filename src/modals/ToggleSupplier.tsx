@@ -40,7 +40,7 @@ const ToggleSupplier = (props: Props) => {
   const getFormData = async () => {
     setIsGetting(true);
     try {
-      const res = await handleAPI(API.GET_FORM);
+      const res = await handleAPI(API.FORM_SUPPLIERS);
       res.data.result && setFormData(res.data.result);
     } catch (error: any) {
       message.error(error.message)

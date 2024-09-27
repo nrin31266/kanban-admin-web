@@ -1,13 +1,13 @@
 
 export const replaceName = (str: string) => {
-  return str
-    .toLowerCase() 
-    .normalize("NFD") 
-    .replace(/[\u0300-\u036f]/g, "") 
-    .replace(/\s+/g, "-") 
-    .replace(/[^\w\-]+/g, "") 
-    .replace(/-+/g, "-") 
-    .trim(); 
+	return str
+		.normalize('NFD')
+		.toLocaleLowerCase()
+		.replace(/[\u0300-\u036f]/g, '')
+		.replace(/đ/g, 'd')
+		.replace(/Đ/g, 'D')
+		.replace(/ /g, '-')
+		.replace(/[:!@#$%^&*()?;/]/g, '');
 };
 
 

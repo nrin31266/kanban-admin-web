@@ -7,6 +7,7 @@ import { RiBarChartBoxLine } from "react-icons/ri";
 import { BsInboxes } from "react-icons/bs";
 import { CgList } from "react-icons/cg";
 import { appInfos, colors } from "../configurations/configurations";
+import { FaTags } from "react-icons/fa";
 
 type MenuItem = Required<MenuProps>["items"][number];
 const { Sider } = Layout;
@@ -18,7 +19,6 @@ const SiderComponent = () => {
       key: "dashboard",
       label: <Link to={"/"}>Dashboard</Link>,
       icon: <LuHome size={20} />,
-      
     },
     {
       key: "inventory",
@@ -26,10 +26,15 @@ const SiderComponent = () => {
       icon: <MdOutlineInventory2 size={20} />,
       children: [
         {
-          key: 'add-new',
-          label: <Link to={'/inventory/add-product'}>Add product</Link>
-        }
-      ]
+          key: "add-new",
+          label: <Link to={"/inventory/add-product"}>Add product</Link>,
+        },
+      ],
+    },
+    {
+      key: "categories",
+      label: <Link to={"/categories"}>Categories</Link>,
+      icon: <FaTags  size={20} />,
     },
     {
       key: "report",
@@ -54,31 +59,34 @@ const SiderComponent = () => {
   ];
 
   return (
-    <Sider theme="light" style={{
-        height: '100vh',
-        
-    }}
-    width={200}
-    >
-      <div className=" p-3 d-flex">
-        <img
-          src={appInfos.logo}
-          alt=""
-          style={{
-            width: "48px",
-          }}
-        />
-        <Text className="mt-2"
-          style={{
-            fontWeight: "bold",
-            fontSize: "1.5rem",
-            color: colors.primary500,
-            margin: 0
-          }}
-        >{appInfos.title}</Text>
-      </div>
-      <Menu mode="inline"  items={items} theme="light"></Menu>
-    </Sider>
+    <>
+      <Sider
+        className="sider-component"
+        theme="light"
+      >
+        <div className=" p-3 d-flex">
+          <img
+            src={appInfos.logo}
+            alt=""
+            style={{
+              width: "48px",
+            }}
+          />
+          <Text
+            className="mt-2"
+            style={{
+              fontWeight: "bold",
+              fontSize: "1.5rem",
+              color: colors.primary500,
+              margin: 0,
+            }}
+          >
+            {appInfos.title}
+          </Text>
+        </div>
+        <Menu mode="inline" items={items} theme="light"></Menu>
+      </Sider>
+    </>
   );
 };
 

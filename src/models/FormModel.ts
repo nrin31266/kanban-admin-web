@@ -25,3 +25,16 @@ export interface SelectModel {
     label: string;
     value: string;
 };
+export interface TreeModelChildren{
+  title: string,
+  value: string,
+  disabled?: boolean 
+  style?:any
+}
+export interface TreeModel {
+  title: string,
+  value: string,
+  style?:any
+  disabled?: boolean
+  children?:TreeModelChildren[]
+}

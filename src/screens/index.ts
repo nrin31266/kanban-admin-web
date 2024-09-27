@@ -5,6 +5,7 @@ import OrdersScreen from './OrdersScreen';
 import ManageStoreScreen from './ManageStoreScreen';
 import SupplierScreen from './SupplierScreen';
 import InventoryScreen from './inventories/InventoryScreen';
+import CategoriesScreen from './CategoriesScreen';
 
 export{
     Login,
@@ -14,5 +15,5 @@ export{
     OrdersScreen,
     ManageStoreScreen,
     SupplierScreen,
-    
+    CategoriesScreen
 }

@@ -32,16 +32,17 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
 }
 
-.ant-menu-title-content a{
+.ant-menu-title-content a {
   text-decoration: none;
 }
 
-.item-wrapping{
+.item-wrapping {
   width: 38px;
   height: 38px;
   border-radius: 12px;
@@ -50,6 +51,62 @@
   justify-content: center;
   align-items: center;
 }
-.ant-card-body{
+
+.ant-card-body {
   padding: 8px 10px !important;
 }
+
+.main-content {
+  width: 98%;
+  background-color: white;
+}
+
+.affix-sider .sider-component {
+  height: 100vh;
+}
+.loader{
+  display: flex;
+  justify-content: center; 
+  align-items: center; 
+  height: 50vh; 
+}
+
+.loader span {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #9e9e9e;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+  display: inline;
+  
+}
+
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 575.98px) {
+  .affix-sider {
+    display: none;
+  }
+
+  .main-content {}
+}
+
+/* Màn hình trung bình (ví dụ: tablet, từ 576px đến 767px) */
+@media (min-width: 576px) and (max-width: 767.98px) {}
+
+/* Màn hình lớn (ví dụ: desktop, từ 768px đến 991px) */
+@media (min-width: 768px) and (max-width: 991.98px) {}
+
+/* Màn hình rất lớn (ví dụ: desktop lớn, từ 992px trở lên) */
+@media (min-width: 992px) {}

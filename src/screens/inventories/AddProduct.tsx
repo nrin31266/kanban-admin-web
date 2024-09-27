@@ -7,17 +7,26 @@ import {
   Divider,
   Form,
   Input,
+  message,
   Select,
   Space,
+  Spin,
+  TreeSelect,
   Typography,
 } from "antd";
 import handleAPI from "../../apis/handleAPI";
-import { API } from "../../configurations/configurations";
-import { SelectModel } from "./../../models/FormModel";
+import { API, colors } from "../../configurations/configurations";
+import {
+  SelectModel,
+  TreeModel,
+  TreeModelChildren,
+} from "./../../models/FormModel";
 import { SupplierModel } from "../../models/SupplierModel";
 import { replace } from "react-router-dom";
 import { replaceName } from "../../utils/replaceName";
 import { uploadFile } from "../../utils/uploadFile";
+import { AddSquare } from "iconsax-react";
+import { ModalCategory } from "../../modals";
 
 const { Text, Title, Paragraph } = Typography;
 const initContent = {
@@ -33,7 +42,9 @@ const AddProduct = () => {
   const editorRef = useRef<any>(null);
   const [form] = Form.useForm();
   const [fileURL, setFileURL] = useState<string>("");
-
+  const [isVisibleCategory, setIsVisibleCategory] = useState(false);
+  const [categories, setCategories] = useState<TreeModel[]>([]);
+  const [selectCategories, setSelectCategories] = useState<TreeModel[]>([]);
   const handleAddNewProduct = async (values: any) => {
     const content = editorRef.current.getContent();
     console.log(content);
@@ -47,8 +58,9 @@ const AddProduct = () => {
     setIsLoading(true);
     try {
       await getSuppliers();
-    } catch (error) {
-      console.log(error);
+      await getCategories();
+    } catch (error: any) {
+      message.error(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -64,17 +76,68 @@ const AddProduct = () => {
     setSuppliersOption(options);
   };
 
-  return (
+  const getTreeValue = (
+    items: any,
+    parentDisable: boolean,
+    childrenDisable: boolean
+  ) => {
+    const categoriesParent: any[] = items.categoriesParent;
+    const categoriesChildren: any[] = items.categoriesChildren;
+    const res: TreeModel[] = [];
+    const childrenMap: { [key: string]: TreeModelChildren[] } = {};
+  
+    categoriesChildren.forEach((child) => {
+      if (!childrenMap[child.parentId]) {
+        childrenMap[child.parentId] = [];
+      }
+      childrenMap[child.parentId].push({
+        title: child.name,
+        value: child.id,
+        disabled: childrenDisable,    
+      });
+    });
+  
+    categoriesParent.forEach((parent) => {
+      const items: TreeModel = {
+        title: parent.name,
+        value: parent.id,
+        disabled: parentDisable,     
+        style: {fontSize: '15px' ,fontWeight: '500', color: `${colors.grey800}` }   
+      };
+  
+      if (childrenMap[parent.id]) {
+        items.children = childrenMap[parent.id];
+      }
+  
+      res.push(items);
+    });
+  
+    return res;
+  };
+  
+
+  const getCategories = async () => {
+    const res = await handleAPI(`${API.CATEGORY}/get`);
+    setCategories(getTreeValue(res.data.result, false, true));
+    setSelectCategories(getTreeValue(res.data.result, false, false));
+  };
+
+  return isLoading ? (
+    <div className="loader">
+      <span className="loader" />
+    </div>
+  ) : (
     <div className="container">
       <Title level={3}>Add new product</Title>
       <Form
+        disabled={isLoading}
         size="large"
         form={form}
         onFinish={handleAddNewProduct}
         layout="vertical"
       >
         <div className="row">
-          <div className="col-8">
+          <div className="col-md-8 ">
             <Form.Item
               name={"title"}
               label={"Title"}
@@ -127,6 +190,7 @@ const AddProduct = () => {
               apiKey="ih07bjaxxgp5ywku0piogyodrxm13wttrpxz59qydzru6vpj"
               init={{
                 plugins: [
+                  // Core editing features
                   "anchor",
                   "autolink",
                   "charmap",
@@ -153,7 +217,7 @@ const AddProduct = () => {
               initialValue={content}
             />
           </div>
-          <div className="col-4">
+          <div className="col-md-4">
             <Card size="small" className="mt-4" title="Categories">
               <Form.Item
                 rules={[
@@ -164,16 +228,25 @@ const AddProduct = () => {
                 ]}
                 name={"categories"}
               >
-                <Select
+                <TreeSelect
+                
+                  allowClear
+                  treeData={selectCategories}
                   dropdownRender={(menu) => (
                     <>
-                      {menu},
-                      <Divider />
-                      <Button type="link">Add new</Button>
+                      {menu}
+                      <Divider className="m-0" />
+                      <Button
+                        onClick={() => setIsVisibleCategory(true)}
+                        icon={<AddSquare size={20} className="mt-1" />}
+                        style={{ padding: "0 8px" }}
+                        type="link"
+                      >
+                        Add new
+                      </Button>
                     </>
                   )}
-                  mode="multiple"
-                ></Select>
+                ></TreeSelect>
               </Form.Item>
             </Card>
             <Card>
@@ -191,18 +264,34 @@ const AddProduct = () => {
               </Space>
             </Card>
             <Card>
-              <Input allowClear onClear={()=> setFileURL('')} value={fileURL} />
-              <Input accept="image/*" type="file" onChange= { async (files: any)=>{
-                const file = files.target.files[0];
-                if(file){
+              <Input
+                allowClear
+                onClear={() => setFileURL("")}
+                value={fileURL}
+              />
+              <Input
+                accept="image/*"
+                type="file"
+                onChange={async (files: any) => {
+                  const file = files.target.files[0];
+                  if (file) {
                     const downloadUrl = await uploadFile(file);
-                    downloadUrl && setFileURL(downloadUrl)
-                }
-              }}/>
+                    downloadUrl && setFileURL(downloadUrl);
+                  }
+                }}
+              />
             </Card>
           </div>
         </div>
       </Form>
+      <ModalCategory
+        values={categories}
+        visible={isVisibleCategory}
+        onAddNew={async() => {
+         await getCategories();
+        }}
+        onClose={() => setIsVisibleCategory(false)}
+      />
     </div>
   );
 };

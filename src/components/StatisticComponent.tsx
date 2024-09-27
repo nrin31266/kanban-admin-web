@@ -34,9 +34,9 @@ const StatisticComponent = (props: Props) => {
 
   return (
     <div>
-      <Card className="mt-2 mb-2)" style={{marginLeft: '-10px', marginRight: '-10px'}}>
+      <Card className="mt-2 mb-2" style={{marginLeft: '-10px', marginRight: '-10px',}}>
         <Title
-          style={{ color: colors.grey600, fontWeight: "500", fontSize: "18px" }}
+          style={{ color: colors.grey600, fontWeight: "500", fontSize: "18px",}}
         >
           {title}
         </Title>
@@ -48,7 +48,7 @@ const StatisticComponent = (props: Props) => {
               style={{
                 marginRight: '4px',
                 boxSizing: 'border-box',
-                minWidth: '175px',
+                minWidth: '200px',
                 background: '#F1F1F9',
                 marginTop: '4px',
                 borderRadius: 8

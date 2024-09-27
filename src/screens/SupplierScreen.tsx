@@ -66,7 +66,7 @@ const SupplierScreen = () => {
       if (res.data.result.data) {
         setTotal(res.data.result.totalElements);
         setSuppliers(res.data.result.data);
-      }
+      }  
     } catch (error: any) {
       console.log(error);
       message.error(error.message);
@@ -76,7 +76,7 @@ const SupplierScreen = () => {
   };
 
   const getForms = async () => {
-    const res = await handleAPI(API.GET_FORM);
+    const res = await handleAPI(API.FORM_SUPPLIERS);
     setForms(res.data.result);
   };
 
