@@ -12,6 +12,7 @@ import {
 import { HeaderComponent, SiderComponent } from "../components";
 import AddProduct from "../screens/inventories/AddProduct";
 import HomeScreen from "../screens/HomeScreen";
+import CategoryDetail from "../screens/categories/CategoryDetail";
 
 const { Content } = Layout;
 
@@ -33,16 +34,18 @@ const MainRouter = () => {
           {/* Phần nội dung */}
           <Content className="main-content container-fluid mt-2 mb-2">
             <Routes>
-              <Route path="/" element={<HomeScreen />}></Route>
-              <Route path="/inventory" element={<InventoryScreen />}></Route>
-              <Route
-                path="/inventory/add-product"
-                element={<AddProduct />}
-              ></Route>
-              <Route path="/report" element={<ReportScreen />}></Route>
-              <Route path="/suppliers" element={<SupplierScreen />}></Route>
-              <Route path="/categories" element={<CategoriesScreen />}></Route>
-              <Route path="/orders" element={<OrdersScreen />}></Route>
+              <Route path="/" element={<HomeScreen />} />
+              <Route>
+                <Route path="/inventory" element={<InventoryScreen />} />
+                <Route path="/inventory/add-product" element={<AddProduct />} />
+              </Route>
+              <Route path="/report" element={<ReportScreen />} />
+              <Route path="/suppliers" element={<SupplierScreen />} />
+              <Route>
+                <Route path="/categories" element={<CategoriesScreen />} />
+                <Route path="/categories/detail/:slug" element={<CategoryDetail />} />
+              </Route>
+              <Route path="/orders" element={<OrdersScreen />} />
               <Route
                 path="/manage-store"
                 element={<ManageStoreScreen />}

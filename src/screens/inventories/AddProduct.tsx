@@ -36,6 +36,7 @@ const initContent = {
 };
 
 const AddProduct = () => {
+  const [isInitLoading, setIsInitLoading] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
   const [content, setContent] = useState("");
   const [suppliersOption, setSuppliersOption] = useState<SelectModel[]>();
@@ -44,10 +45,23 @@ const AddProduct = () => {
   const [fileURL, setFileURL] = useState<string>("");
   const [isVisibleCategory, setIsVisibleCategory] = useState(false);
   const [categories, setCategories] = useState<TreeModel[]>([]);
-  const [selectCategories, setSelectCategories] = useState<TreeModel[]>([]);
+
   const handleAddNewProduct = async (values: any) => {
     const content = editorRef.current.getContent();
-    console.log(content);
+    values.content = content;
+    values.slug = replaceName(values.title);
+    setIsLoading(true);
+    try {
+      await handleAPI(API.PRODUCTS, values, 'post');
+      message.success(`Add product with name '${values.name}' successfully!`);
+      form.resetFields();
+      editorRef.current = null;
+    } catch (error) {
+      console.log(error);
+      message.error('An error occurred when adding a product!');
+    }finally{
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -55,14 +69,14 @@ const AddProduct = () => {
   }, []);
 
   const getData = async () => {
-    setIsLoading(true);
+    setIsInitLoading(true);
     try {
       await getSuppliers();
       await getCategories();
     } catch (error: any) {
       message.error(error.message);
     } finally {
-      setIsLoading(false);
+      setIsInitLoading(false);
     }
   };
 
@@ -71,58 +85,16 @@ const AddProduct = () => {
     const data = res.data.result.data;
     const options = data.map((item: SupplierModel) => ({
       value: item.id,
-      label: `${item.name}-${item.contact}-${item.email}`,
+      label: `Name: ${item.name}, Email: ${item.email}`,
     }));
     setSuppliersOption(options);
   };
-
-  const getTreeValue = (
-    items: any,
-    parentDisable: boolean,
-    childrenDisable: boolean
-  ) => {
-    const categoriesParent: any[] = items.categoriesParent;
-    const categoriesChildren: any[] = items.categoriesChildren;
-    const res: TreeModel[] = [];
-    const childrenMap: { [key: string]: TreeModelChildren[] } = {};
-  
-    categoriesChildren.forEach((child) => {
-      if (!childrenMap[child.parentId]) {
-        childrenMap[child.parentId] = [];
-      }
-      childrenMap[child.parentId].push({
-        title: child.name,
-        value: child.id,
-        disabled: childrenDisable,    
-      });
-    });
-  
-    categoriesParent.forEach((parent) => {
-      const items: TreeModel = {
-        title: parent.name,
-        value: parent.id,
-        disabled: parentDisable,     
-        style: {fontSize: '15px' ,fontWeight: '500', color: `${colors.grey800}` }   
-      };
-  
-      if (childrenMap[parent.id]) {
-        items.children = childrenMap[parent.id];
-      }
-  
-      res.push(items);
-    });
-  
-    return res;
-  };
-  
-
   const getCategories = async () => {
-    const res = await handleAPI(`${API.CATEGORY}/get`);
-    setCategories(getTreeValue(res.data.result, false, true));
-    setSelectCategories(getTreeValue(res.data.result, false, false));
+    const res = await handleAPI(`${API.CATEGORY}/get-tree`);
+    setCategories(res.data.result);
   };
 
-  return isLoading ? (
+  return isInitLoading ? (
     <div className="loader">
       <span className="loader" />
     </div>
@@ -158,7 +130,7 @@ const AddProduct = () => {
                     message: "Required",
                   },
                 ]}
-                name={"supplier"}
+                name={"supplierId"}
               >
                 <Select
                   placeholder={"Select supplier"}
@@ -229,9 +201,12 @@ const AddProduct = () => {
                 name={"categories"}
               >
                 <TreeSelect
-                
+                  filterTreeNode={(input, treeNode) =>
+                    replaceName(treeNode.props.title).includes(replaceName(input))
+                  }
+                  multiple
                   allowClear
-                  treeData={selectCategories}
+                  treeData={categories}
                   dropdownRender={(menu) => (
                     <>
                       {menu}
@@ -252,13 +227,15 @@ const AddProduct = () => {
             <Card>
               <Space>
                 <Button
+                  disabled={isLoading}
                   onClick={() => {
                     form.resetFields();
+                    editorRef.current = null;
                   }}
                 >
                   Cancel
                 </Button>
-                <Button type="primary" onClick={() => form.submit()}>
+                <Button loading={isLoading} type="primary" onClick={() => form.submit()}>
                   Submit
                 </Button>
               </Space>
@@ -287,8 +264,8 @@ const AddProduct = () => {
       <ModalCategory
         values={categories}
         visible={isVisibleCategory}
-        onAddNew={async() => {
-         await getCategories();
+        onAddNew={async () => {
+          await getCategories();
         }}
         onClose={() => setIsVisibleCategory(false)}
       />

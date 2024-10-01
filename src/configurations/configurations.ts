@@ -12,7 +12,8 @@ export const API = {
   DELETE_SUPPLIER: (suppliersId:string) => `/kanban/suppliers?suppliersId=${suppliersId}`,
   FORM_SUPPLIERS: "/kanban/suppliers/form",
   CATEGORY: "/kanban/categories",
-  
+  GET_CATEGORIES_TREE: "/kanban/categories/get-tree",
+  PRODUCTS: "/kanban/products",
 };
 
 export const appInfos = {

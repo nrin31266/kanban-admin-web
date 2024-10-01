@@ -5,7 +5,7 @@ import OrdersScreen from './OrdersScreen';
 import ManageStoreScreen from './ManageStoreScreen';
 import SupplierScreen from './SupplierScreen';
 import InventoryScreen from './inventories/InventoryScreen';
-import CategoriesScreen from './CategoriesScreen';
+import CategoriesScreen from './categories/CategoriesScreen';
 
 export{
     Login,
