@@ -6,6 +6,7 @@ import {
   Card,
   Divider,
   Form,
+  Image,
   Input,
   message,
   Select,
@@ -27,6 +28,7 @@ import { replaceName } from "../../utils/replaceName";
 import { uploadFile } from "../../utils/uploadFile";
 import { AddSquare } from "iconsax-react";
 import { ModalCategory } from "../../modals";
+import { ProductModel } from './../../models/Products';
 
 const { Text, Title, Paragraph } = Typography;
 const initContent = {
@@ -45,17 +47,27 @@ const AddProduct = () => {
   const [fileURL, setFileURL] = useState<string>("");
   const [isVisibleCategory, setIsVisibleCategory] = useState(false);
   const [categories, setCategories] = useState<TreeModel[]>([]);
+  const [files, setFiles] = useState<any[]>([]);
+  const inputFileRef = useRef<any>(null); 
 
-  const handleAddNewProduct = async (values: any) => {
+  const handleAddNewProduct = async (values: ProductModel) => {
+    setIsLoading(true);
     const content = editorRef.current.getContent();
     values.content = content;
-    values.slug = replaceName(values.title);
-    setIsLoading(true);
+    values.slug = replaceName(values.title); 
+    if (files.length > 0) {
+      const uploadPromises = Object.keys(files).map(async (i) => {
+          const index = parseInt(i);
+          const url = await uploadFile(files[index]);
+          return url;
+      });
+      values.images = await Promise.all(uploadPromises);
+  }
     try {
-      await handleAPI(API.PRODUCTS, values, 'post');
-      message.success(`Add product with name '${values.name}' successfully!`);
+      const res = await handleAPI(API.PRODUCTS, values, 'post');
+      message.success(`Add product with name '${values.title}' successfully!`);
       form.resetFields();
-      editorRef.current = null;
+      editorRef.current.setContent('');
     } catch (error) {
       console.log(error);
       message.error('An error occurred when adding a product!');
@@ -224,6 +236,24 @@ const AddProduct = () => {
                 ></TreeSelect>
               </Form.Item>
             </Card>
+            <Card title={'Images'} extra={
+              <Button size="small" onClick={()=>inputFileRef.current.click()}>Upload images</Button>
+            }>
+              {
+                files.length > 0 &&
+                <Image.PreviewGroup>
+                  {
+                    Object.keys(files).map((i) => {
+                      const index = parseInt(i);
+                      return <Image style={{
+                        border: '1px solid silver'
+                      }} width={'50%'} src={URL.createObjectURL(files[index])}/>
+                    })
+                  }
+                </Image.PreviewGroup>
+              }
+              
+            </Card>
             <Card>
               <Space>
                 <Button
@@ -261,6 +291,10 @@ const AddProduct = () => {
           </div>
         </div>
       </Form>
+      <div className="d-none">
+        <input type="file" multiple accept="image/*" ref={inputFileRef} 
+        onChange={(values: any)=> setFiles(values.target.files)}></input>
+      </div>
       <ModalCategory
         values={categories}
         visible={isVisibleCategory}

@@ -22,9 +22,13 @@ const SiderComponent = () => {
     },
     {
       key: "inventory",
-      label: <Link to={"/inventory"}>Inventory</Link>,
+      label: 'Inventory',
       icon: <MdOutlineInventory2 size={20} />,
       children: [
+        {
+          key: "inventory",
+          label: <Link to={"/inventory"}>All product</Link>,
+        },
         {
           key: "add-new",
           label: <Link to={"/inventory/add-product"}>Add product</Link>,
