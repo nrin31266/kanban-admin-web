@@ -1,18 +1,14 @@
 import React from "react";
 import { Layout, Affix } from "antd";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import {
-  CategoriesScreen,
-  InventoryScreen,
-  ManageStoreScreen,
-  OrdersScreen,
-  ReportScreen,
-  SupplierScreen,
-} from "../screens";
 import { HeaderComponent, SiderComponent } from "../components";
-import AddProduct from "../screens/inventories/AddProduct";
-import HomeScreen from "../screens/HomeScreen";
-import CategoryDetail from "../screens/categories/CategoryDetail";
+import HomeScreen from "../screens/admin/HomeScreen";
+import InventoryScreen from "../screens/admin/inventories/InventoryScreen";
+import AddProduct from "../screens/admin/inventories/AddProduct";
+import { ManageStoreScreen, OrdersScreen, ReportScreen, SupplierScreen } from "../screens/admin";
+import CategoriesScreen from "../screens/admin/categories/CategoriesScreen";
+import CategoryDetail from "../screens/admin/categories/CategoryDetail";
+
 
 const { Content } = Layout;
 

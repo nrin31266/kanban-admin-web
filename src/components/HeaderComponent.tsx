@@ -5,9 +5,10 @@ import { TbMessageExclamation } from "react-icons/tb";
 import { API, colors } from "../configurations/configurations";
 import handleAPI from "../apis/handleAPI";
 import { useDispatch } from 'react-redux';
-import { refreshToken, removeAuth } from "../redux/reducers/authReducer";
+import { refreshAccessToken, removeAuth } from "../redux/reducers/authReducer";
 import { useNavigate } from "react-router-dom";
-import { getAuth, getRefreshToken, verifyToken } from "../apis/axiosClient";
+import { AuthModel, LogoutRequest } from "../models/AuthenticationModel";
+import { getAuth } from "../apis/axiosClient";
 const { Title } = Typography;
 
 function HeaderComponent() {
@@ -18,77 +19,30 @@ function HeaderComponent() {
   const handleLogout = async () => {
     setIsLoading(true);
     try {
-      const dataToken = getAuth();
-      if (dataToken) {
-        await handleAPI(API.LOGOUT, dataToken, 'post');
+      const authData: AuthModel = getAuth();
+      const logoutRequest: LogoutRequest = {
+        token: authData.accessToken
       }
-      dispatch(removeAuth({}));
-      localStorage.clear();
-      navigate('/');
+      await handleAPI(API.LOGOUT, logoutRequest, 'post');
     } catch (error: any) {
       console.log(error);
-      dispatch(removeAuth({}));
-      localStorage.clear();
-      navigate('/');
     } finally {
       setIsLoading(false);
     }
+    dispatch(removeAuth());
+    localStorage.clear();
+    navigate('/');
   };
 
-  const handleVerifyToken = async () => {
-    setIsLoading(true);
-    try {
-      await verifyToken();
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleRefreshToken = async () => {
-    setIsLoading(true);
-    try {
-      const res: any = await getRefreshToken();
-      if (res) {
-        if (res !== true) {
-          dispatch(refreshToken(res));
-        }
-      } else {
-        dispatch(removeAuth({}));
-        localStorage.clear();
-        navigate("/");
-        console.log(res);
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
 
   const items: MenuProps['items'] = [
-		{
-			key: 'verify-token',
-			label: 'Verify token',
-			onClick: async () => {
-				handleVerifyToken();
-			},
-		},
-    {
-			key: 'refresh-token',
-			label: 'Refresh token',
-			onClick: async () => {
-				handleRefreshToken();
-			},
-		},
     {
 			key: 'logout',
 			label: 'Log out',
 			onClick: async () => {
 				handleLogout();
-				dispatch(removeAuth({}));
+				dispatch(removeAuth());
 				localStorage.clear();
 				navigate('/');
 			},

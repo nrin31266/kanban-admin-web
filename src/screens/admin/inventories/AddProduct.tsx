@@ -15,20 +15,20 @@ import {
   TreeSelect,
   Typography,
 } from "antd";
-import handleAPI from "../../apis/handleAPI";
-import { API, colors } from "../../configurations/configurations";
+import handleAPI from "../../../apis/handleAPI";
+import { API, colors } from "../../../configurations/configurations";
 import {
   SelectModel,
   TreeModel,
   TreeModelChildren,
-} from "./../../models/FormModel";
-import { SupplierModel } from "../../models/SupplierModel";
+} from "./../../../models/FormModel";
+import { SupplierModel } from "../../../models/SupplierModel";
 import { replace } from "react-router-dom";
-import { replaceName } from "../../utils/replaceName";
-import { uploadFile } from "../../utils/uploadFile";
+import { replaceName } from "../../../utils/replaceName";
+import { uploadFile } from "../../../utils/uploadFile";
 import { AddSquare } from "iconsax-react";
-import { ModalCategory } from "../../modals";
-import { ProductModel } from './../../models/Products';
+import { ModalCategory } from "../../../modals";
+import { ProductModel } from './../../../models/Products';
 
 const { Text, Title, Paragraph } = Typography;
 const initContent = {

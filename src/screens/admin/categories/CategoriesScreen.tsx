@@ -4,12 +4,12 @@ import { Button, Card, message, Modal, Space, Table, Tooltip } from "antd";
 import { ColumnProps } from "antd/es/table";
 import { FaTrashAlt } from "react-icons/fa";
 import { FiEdit3 } from "react-icons/fi";
-import { CategoryModel, CategoryTableData } from "../../models/Products";
-import { TreeModel } from "../../models/FormModel";
-import handleAPI from "../../apis/handleAPI";
-import { API } from "../../configurations/configurations";
-import { AddCategory } from "../../components";
 import { Link } from "react-router-dom";
+import { CategoryTableData } from "../../../models/Products";
+import { TreeModel } from "../../../models/FormModel";
+import handleAPI from "../../../apis/handleAPI";
+import { API } from "../../../configurations/configurations";
+import { AddCategory } from "../../../components";
 
 const { confirm } = Modal;
 

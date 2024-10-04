@@ -1,13 +1,22 @@
-import { Button, Card, Checkbox, Form, Input, message, Space, Typography } from "antd";
+import {
+  Button,
+  Card,
+  Checkbox,
+  Form,
+  Input,
+  message,
+  Space,
+  Typography,
+} from "antd";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import SocialLogin from "./components/SocialLogin";
 import handleAPI from "../../apis/handleAPI";
 import { useDispatch } from "react-redux";
-import { addAuth } from "../../redux/reducers/authReducer";
+import { addAuth, refreshAccessToken } from "../../redux/reducers/authReducer";
 import { API, appInfos } from "../../configurations/configurations";
+import { AuthModel } from "../../models/AuthenticationModel";
 const { Title, Paragraph, Text } = Typography;
-
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -17,10 +26,25 @@ const Login = () => {
   const handleLogin = async (values: { email: string; password: string }) => {
     setIsLoading(true);
     try {
-      const res = await handleAPI(API.LOGIN, values, 'post');
-      message.success('Login successfully!')
-      dispatch(addAuth(res.data.result));
+      // Gọi API đăng nhập
+      const res = await handleAPI(API.LOGIN, values, "post");
+      message.success("Login successfully!");
 
+      // Lưu accessToken
+      const accessToken = res.data.result.token;
+      dispatch(refreshAccessToken(accessToken));
+
+      // Gọi API lấy thông tin người dùng
+      const resUserInfo = await handleAPI(API.USER_INFO);
+
+      // Lưu userInfo vào Redux store
+      const userInfo = resUserInfo.data.result;
+      dispatch(
+        addAuth({
+          accessToken,
+          userInfo,
+        })
+      );
     } catch (error: any) {
       console.log(error);
       message.error(error.message);
@@ -33,7 +57,7 @@ const Login = () => {
     <>
       <Card
         style={{
-          width: '380px'
+          width: "380px",
         }}
       >
         <div className="text-center">

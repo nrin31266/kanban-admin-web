@@ -1,8 +1,8 @@
 import { Button, Table } from 'antd'
 import React, { useEffect, useState } from 'react'
-import handleAPI from '../../apis/handleAPI';
-import { API } from '../../configurations/configurations';
-import { ProductModel } from '../../models/Products';
+import { ProductModel } from '../../../models/Products';
+import handleAPI from '../../../apis/handleAPI';
+import { API } from '../../../configurations/configurations';
 
 const InventoryScreen = () => {
   const [ isLoading, setIsLoading ] = useState<boolean>(false);

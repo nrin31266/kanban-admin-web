@@ -3,6 +3,7 @@ import queryString from "query-string";
 import { localDataNames } from "../constants/appInfos";
 import handleAPI from "./handleAPI";
 import { API } from "../configurations/configurations";
+import { AuthModel } from "../models/AuthenticationModel";
 
 const baseURL = `http://localhost:8888/api/v1`;
 
@@ -22,17 +23,6 @@ export const getAuth = () => {
   const res = localStorage.getItem(localDataNames.authData);
   return res ? JSON.parse(res) : {};
 };
-export const verifyToken = async () => {
-  try {
-    const dataAuth = getAuth();
-    if (dataAuth) {
-      const res = await handleAPI(API.VERIFY_TOKEN, dataAuth, "post");
-      console.log(res.data);
-    }
-  } catch (error: any) {
-    console.log(error);
-  }
-};
 
 const axiosClient = axios.create({
   baseURL,
@@ -41,11 +31,11 @@ const axiosClient = axios.create({
 
 axiosClient.interceptors.request.use(
   async (config: any) => {
-    const accessToken = getAuth();
+    const authData:AuthModel = getAuth();
 
     config.headers = {
-      Authorization: accessToken.token
-        ? `Bearer ${accessToken.token}`
+      Authorization: authData.accessToken
+        ? `Bearer ${authData.accessToken}`
         : undefined,
       Accept: "application/json",
       ...config.headers,
@@ -117,21 +107,4 @@ axiosClient.interceptors.response.use(
 
 export default axiosClient;
 
-export const getRefreshToken = async () => {
-  try {
-    const dataAuth = getAuth();
-    if (dataAuth) {
-      const res = await handleAPI(API.REFRESH_TOKEN, dataAuth, "post");
-      if (res.data && res.data.result && res.data.result.tokenValid === true) {
-        return res.data.result.token ? res.data.result.token : true;
-      } else {
-        return undefined;
-      }
-    } else {
-      return undefined;
-    }
-  } catch (error: any) {
-    console.log(error);
-    return undefined;
-  }
-};
+
