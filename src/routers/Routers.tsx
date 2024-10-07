@@ -41,7 +41,7 @@ const Routers = () => {
 			setIsLoading(false);
 		}
 	};
-
+	
 	return isLoading ? <Spin /> : !auth.accessToken ? <AuthRouter /> : auth.userInfo.roles.some(item => item.name === Role.ADMIN)? <MainRouter /> : <MainUserRouter/>;
 };
 

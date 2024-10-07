@@ -16,6 +16,7 @@ export const API = {
   CATEGORY: "/kanban/categories",
   GET_CATEGORIES_TREE: "/kanban/categories/get-tree",
   PRODUCTS: "/kanban/products",
+  SUB_PRODUCTS: "/kanban/sub-products",
 };
 
 export const appInfos = {

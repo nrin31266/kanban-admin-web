@@ -40,6 +40,7 @@ axiosClient.interceptors.request.use(
       Accept: "application/json",
       ...config.headers,
     };
+    console.log(config);
 
     return config;
   },

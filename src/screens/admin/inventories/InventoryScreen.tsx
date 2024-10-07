@@ -7,11 +7,15 @@ import { ColumnProps } from "antd/es/table";
 import { Link } from "react-router-dom";
 import { listColors } from "../../../constants/listColors";
 import { MdLibraryAdd } from "react-icons/md";
+import { ModalAddSubProduct } from "../../../modals";
 
 const InventoryScreen = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isInitLoading, setIsInitLoading] = useState<boolean>(false);
   const [products, setProducts] = useState<ProductModel[]>([]);
+  const [isVisibleModalAddSubProduct, setIsVisibleModalAddSubProduct] =
+    useState<boolean>(false);
+  const [productSelected, setProductSelected] = useState<ProductModel>();
 
   useEffect(() => {
     getProducts();
@@ -81,18 +85,25 @@ const InventoryScreen = () => {
     {
       key: "action",
       dataIndex: "",
-      
+
       title: "Action",
       render: (product: ProductModel) => (
         <Space>
-          <Tooltip title={'Add sub product'}>
-            <Button type="text">
+          <Tooltip title={"Add sub product"}>
+            <Button
+            size="small"
+              type="text"
+              onClick={() => {
+                setIsVisibleModalAddSubProduct(true);
+                setProductSelected(product);
+              }}
+            >
               <MdLibraryAdd color={colors.primary500} size={20} />
             </Button>
           </Tooltip>
         </Space>
       ),
-      fixed: 'right'
+      fixed: "right",
     },
   ];
 
@@ -103,6 +114,14 @@ const InventoryScreen = () => {
         columns={columns}
         loading={isLoading}
       ></Table>
+      <ModalAddSubProduct
+        product={productSelected}
+        onClose={() => {
+          setIsVisibleModalAddSubProduct(false);
+          setProductSelected(undefined);
+        }}
+        visible={isVisibleModalAddSubProduct}
+      />
     </>
   );
 };
