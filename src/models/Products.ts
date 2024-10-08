@@ -30,4 +30,16 @@ export interface ProductModel {
   categories: CategoryModel[]
   createdAt: string
   updatedAt: string
+  subProductResponse: SubProductModel[];
+}
+
+export interface SubProductModel {
+  size: string
+  color: any
+  price: number
+  quantity: number
+  images: string[]
+  product: ProductModel
+  createdAt: string
+  updatedAt: string
 }

@@ -4,6 +4,7 @@ import { localDataNames } from "../constants/appInfos";
 import handleAPI from "./handleAPI";
 import { API } from "../configurations/configurations";
 import { AuthModel } from "../models/AuthenticationModel";
+import { ApiResponse } from "../models/AppModel";
 
 const baseURL = `http://localhost:8888/api/v1`;
 
@@ -49,11 +50,12 @@ axiosClient.interceptors.request.use(
 
 axiosClient.interceptors.response.use(
   async (response: AxiosResponse) => {
-    const { code } = response.data;
-    if (code === 1000) {
+    const apiResponse: ApiResponse = response.data;
+    //Successfully
+    if (apiResponse.code === 1000) {
       return response;
     } else {
-      return Promise.reject(response.data);
+      return Promise.reject(apiResponse);
     }
   },
   async (error: AxiosError) => {

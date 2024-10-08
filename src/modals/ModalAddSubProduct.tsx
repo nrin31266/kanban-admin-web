@@ -11,7 +11,7 @@ import {
   UploadProps,
 } from "antd";
 import React, { useEffect, useState } from "react";
-import { ProductModel } from "../models/Products";
+import { ProductModel, SubProductModel } from "../models/Products";
 import { API, colors } from "../configurations/configurations";
 import { uploadFiles } from "../utils/uploadFile";
 import handleAPI from "../apis/handleAPI";
@@ -20,12 +20,13 @@ interface Props {
   visible: boolean;
   onClose: () => void;
   product?: ProductModel;
+  onAddNew: (values: SubProductModel)=>void
 }
 
 const ModalAddSubProduct = (props: Props) => {
   const [color, setColor] = React.useState<string>('#1677ff');
   const [isLoading, setIsLoading] = useState(false);
-  const { visible, onClose, product } = props;
+  const { visible, onClose, product, onAddNew } = props;
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<any[]>([]);
   useEffect(() => {
@@ -57,6 +58,7 @@ const ModalAddSubProduct = (props: Props) => {
       try {
         const res = await handleAPI(API.SUB_PRODUCTS, values, 'post');
         message.success('Add sub product successfully!');
+        onAddNew(res.data.result);
         handleClose();
       } catch (error) {
         message.error('Error when adding sub product!');
