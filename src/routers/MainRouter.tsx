@@ -5,7 +5,7 @@ import { HeaderComponent, SiderComponent } from "../components";
 import HomeScreen from "../screens/admin/HomeScreen";
 import InventoryScreen from "../screens/admin/inventories/InventoryScreen";
 import AddProduct from "../screens/admin/inventories/AddProduct";
-import { ManageStoreScreen, OrdersScreen, ReportScreen, SupplierScreen } from "../screens/admin";
+import { ManageStoreScreen, OrdersScreen, ProductDetail, ReportScreen, SupplierScreen } from "../screens/admin";
 import CategoriesScreen from "../screens/admin/categories/CategoriesScreen";
 import CategoryDetail from "../screens/admin/categories/CategoryDetail";
 
@@ -34,6 +34,7 @@ const MainRouter = () => {
               <Route>
                 <Route path="/inventory" element={<InventoryScreen />} />
                 <Route path="/inventory/add-product" element={<AddProduct />} />
+                <Route path="/inventory/detail/:slug" element={<ProductDetail />} />
               </Route>
               <Route path="/report" element={<ReportScreen />} />
               <Route path="/suppliers" element={<SupplierScreen />} />

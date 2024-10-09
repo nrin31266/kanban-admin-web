@@ -102,9 +102,7 @@
   .main-content {}
 }
 
-.ant-table {
-  overflow-x: auto; /* Để bảng cuộn trên các thiết bị nhỏ */
-}
+
 
 
 /* Màn hình trung bình (ví dụ: tablet, từ 576px đến 767px) */

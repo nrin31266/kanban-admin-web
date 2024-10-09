@@ -1,4 +1,4 @@
-import { Avatar, Button, Image, Space, Table, Tag, Tooltip } from "antd";
+import { Avatar, Button, Image, message, Modal, Space, Table, Tag, Tooltip } from "antd";
 import React, { useEffect, useState } from "react";
 import {
   CategoryModel,
@@ -12,6 +12,8 @@ import { Link } from "react-router-dom";
 import { listColors } from "../../../constants/listColors";
 import { MdLibraryAdd } from "react-icons/md";
 import { ModalAddSubProduct } from "../../../modals";
+import { Edit2, Trash } from "iconsax-react";
+const { confirm } = Modal;
 
 const InventoryScreen = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -37,21 +39,43 @@ const InventoryScreen = () => {
     }
   };
 
+  const handleRemoveProduct = async (productId: string) => {
+    setIsLoading(true);
+    try {
+      const res = await handleAPI(`${API.PRODUCTS}/${productId}`, undefined, 'delete');
+      console.log(res);
+      res.data.result ? message.success(res.data.message) : message.error(res.data.message);      
+      getProducts();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const columns: ColumnProps<ProductModel>[] = [
     {
       key: "title",
-      dataIndex: "title",
+      dataIndex: "",
       title: "Title",
+      width: 190,
+      render: (item: ProductModel) => (
+        <Link to={`/inventory/detail/${item.slug}?id=${item.id}`}>
+          {item.title}
+        </Link>
+      ),
     },
     {
       key: "description",
       dataIndex: "description",
       title: "Description",
+      width: 300,
     },
     {
       key: "categories",
       dataIndex: "categories",
       title: "Categories",
+      width: 200,
       render: (categories: CategoryModel[]) =>
         categories &&
         categories.length > 0 && (
@@ -74,25 +98,39 @@ const InventoryScreen = () => {
       key: "images",
       dataIndex: "images",
       title: "Image",
+      width: 300,
       render: (images: string[]) =>
-        images &&
-        images.length > 0 && (
-          <Space>
-            <Avatar.Group>
-              {images.map((img, _index) => (
-                <Image src={img} width={"50px"} height={"50px"} />
-              ))}
-            </Avatar.Group>
-          </Space>
+        images && images.length > 0 ? (
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap", // Cho phép hình ảnh tự động xuống hàng
+              gap: "4px", // Khoảng cách giữa các hình ảnh
+            }}
+          >
+            {images.map((img, _index) => (
+              <Image
+                key={`image-${_index}`} // Thêm key để đảm bảo tính duy nhất cho từng hình ảnh
+                src={img}
+                width={"50px"}
+                height={"50px"}
+                style={{ borderRadius: "4px" }} // Nếu bạn muốn hình ảnh có viền mềm mại hơn
+              />
+            ))}
+          </div>
+        ) : (
+          <span className="text-secondary">No image</span>
         ),
     },
+
     {
       key: "colors",
       dataIndex: "subProductResponse",
       title: "Color",
+      width: 120,
       render: (items: SubProductModel[]) => {
         if (!items || items.length === 0) {
-          return null; // Không có gì để hiển thị
+          return <span className="text-secondary">No color</span>; // Không có gì để hiển thị
         }
 
         const colors: string[] = [];
@@ -104,20 +142,29 @@ const InventoryScreen = () => {
         });
 
         return (
-          <Space>
-            {colors.map((color, index) => (
-              <div
-                style={{
-                  width: 24,
-                  height: 24,
-                  backgroundColor: color,
-                  borderRadius: 12,
-                  border: "1px solid #000", // Thêm viền nếu muốn nhìn rõ màu
-                }}
-                key={`color-${color}-${index}`}
-              />
-            ))}
-          </Space>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+            }}
+          >
+            {colors.map(
+              (color, index) =>
+                color && (
+                  <div
+                    style={{
+                      margin: "2px",
+                      width: 24,
+                      height: 24,
+                      backgroundColor: color,
+                      borderRadius: 12,
+                      border: "1px solid #000", // Thêm viền nếu muốn nhìn rõ màu
+                    }}
+                    key={`color-${color}-${index}`}
+                  />
+                )
+            )}
+          </div>
         );
       },
     },
@@ -126,9 +173,10 @@ const InventoryScreen = () => {
       key: "sizes",
       dataIndex: "subProductResponse",
       title: "Sizes",
+      width: 200,
       render: (items: SubProductModel[]) => {
         if (!items || items.length === 0) {
-          return null; // Không có gì để hiển thị
+          return <span className="text-secondary">No size</span>; // Không có gì để hiển thị
         }
         return (
           <Space wrap>
@@ -144,14 +192,15 @@ const InventoryScreen = () => {
       key: "prices",
       dataIndex: "subProductResponse",
       title: "Prices",
+      width: 200,
       render: (items: SubProductModel[]) => {
         if (!items || items.length === 0) {
-          return "";
+          return <span className="text-secondary">N/A</span>;
         }
 
         // Nếu chỉ có một item, trả về giá trị price của item đó
         if (items.length === 1) {
-          return items[0].price;
+          return items[0].price.toLocaleString();
         }
 
         // Tìm giá trị nhỏ nhất và lớn nhất của price
@@ -163,8 +212,8 @@ const InventoryScreen = () => {
           return ""; // Không có giá trị price hợp lệ
         }
 
-        const minPrice = Math.min(...prices);
-        const maxPrice = Math.max(...prices);
+        const minPrice = Math.min(...prices).toLocaleString();
+        const maxPrice = Math.max(...prices).toLocaleString();
 
         // Nếu min và max bằng nhau, chỉ hiển thị một giá trị, ngược lại hiển thị range
         return minPrice === maxPrice ? minPrice : `${minPrice} - ${maxPrice}`;
@@ -175,9 +224,10 @@ const InventoryScreen = () => {
       key: "quantity",
       dataIndex: "subProductResponse",
       title: "Quantity",
+      width: 200,
       render: (items: SubProductModel[]) => {
         if (!items || items.length === 0) {
-          return "";
+          return <span className="text-secondary">0</span>;
         }
 
         let quantity = 0;
@@ -195,12 +245,13 @@ const InventoryScreen = () => {
     {
       key: "action",
       dataIndex: "",
-
+      width: 100,
       title: "Action",
       render: (product: ProductModel) => (
         <Space>
-          <Tooltip title={"Add sub product"}>
+          <Tooltip title={"Add sub product"} key={"addSubProduct"}>
             <Button
+              className="p-0"
               size="small"
               type="text"
               onClick={() => {
@@ -209,6 +260,31 @@ const InventoryScreen = () => {
               }}
             >
               <MdLibraryAdd color={colors.primary500} size={20} />
+            </Button>
+          </Tooltip>
+          <Tooltip title={"Edit product"} key={"btnEdit"}>
+            <Button
+              className="p-0"
+              size="small"
+              type="text"
+              onClick={() => {
+                setProductSelected(product);
+                console.log(productSelected);
+              }}
+            >
+              <Edit2 className="text-primary" size={20} />
+            </Button>
+          </Tooltip>
+          <Tooltip title={"Delete product"} key={"btnDelete"}>
+            <Button className="p-0" size="small" type="text" onClick={() => {
+              confirm({
+                title: 'Confirm',
+                content: 'Are you sure to delete the product, any by-products will be lost!',
+                onOk: ()=> handleRemoveProduct(product.id),
+                onCancel: () => console.log('Cancel')
+              })
+            }}>
+              <Trash className="text-danger" size={20} />
             </Button>
           </Tooltip>
         </Space>
@@ -224,10 +300,13 @@ const InventoryScreen = () => {
         dataSource={products}
         columns={columns}
         loading={isLoading}
+        scroll={{
+          y: "calc(100vh - 245px)",
+        }}
       ></Table>
       <ModalAddSubProduct
         onAddNew={(values: SubProductModel) => {
-          console.log(values);
+          getProducts();
         }}
         product={productSelected}
         onClose={() => {
