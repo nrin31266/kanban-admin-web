@@ -13,6 +13,8 @@ import {
   Space,
   TreeSelect,
   Typography,
+  Upload,
+  UploadProps,
 } from "antd";
 import handleAPI from "../../../apis/handleAPI";
 import { API, colors } from "../../../configurations/configurations";
@@ -20,7 +22,7 @@ import { SelectModel, TreeModel } from "./../../../models/FormModel";
 import { SupplierModel } from "../../../models/SupplierModel";
 import { replace, useNavigate, useSearchParams } from "react-router-dom";
 import { replaceName } from "../../../utils/replaceName";
-import { uploadFile } from "../../../utils/uploadFile";
+import { uploadFile, uploadFiles } from "../../../utils/uploadFile";
 import { AddSquare } from "iconsax-react";
 import { ModalCategory } from "../../../modals";
 import { ProductModel } from "./../../../models/Products";
@@ -36,12 +38,13 @@ const AddProduct = () => {
   const [fileURL, setFileURL] = useState<string>("");
   const [isVisibleCategory, setIsVisibleCategory] = useState(false);
   const [categories, setCategories] = useState<TreeModel[]>([]);
-  const [files, setFiles] = useState<any[]>([]);
-  const inputFileRef = useRef<any>(null);
+  // const [files, setFiles] = useState<any[]>([]);
+  // const inputFileRef = useRef<any>(null);
   const [content, setContent] = useState<string>("");
   const [searchPrams] = useSearchParams();
   const [idProduct, setIdProduct] = useState<string | null>("");
   const navigate = useNavigate();
+  const [fileList, setFileList] = useState<any[]>([]);
 
   useEffect(() => {
     if (searchPrams.get("id")) {
@@ -54,21 +57,47 @@ const AddProduct = () => {
   useEffect(() => {
     if (idProduct) {
       console.log(idProduct);
-      getProduct(idProduct);
+      getProductDetail(idProduct);
     }
   }, [idProduct]);
 
-  const getProduct = async (idProduct: string) => {
+  const handleChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
+    const items = newFileList.map((item) =>
+      item.originFileObj
+        ? {
+            ...item,
+            url: item.originFileObj
+              ? URL.createObjectURL(item.originFileObj)
+              : "",
+            status: "done",
+          }
+        : { ...item }
+    );
+    setFileList(items);
+  };
+  console.log(fileList);
+  const getProductDetail = async (idProduct: string) => {
     try {
       const res = await handleAPI(`${API.PRODUCTS}/${idProduct}`);
       const item: ProductModel = res.data.result;
       if (item) {
-        console.log(item);
         const { categories, ...filterItem } = item;
         const listIdCategories = categories.map((values, _index) => values.id);
         form.setFieldsValue(filterItem);
         form.setFieldValue("categories", listIdCategories);
-        setContent(filterItem.content);
+        setContent(item.content);
+        if (item.images && item.images.length > 0) {
+          const imgs: any = []; // Khởi tạo mảng imgs
+          item.images.forEach((urlImg, index) => {
+            imgs.push({
+              uid: index, // Có thể sử dụng index, nhưng đảm bảo rằng nó không bị trùng lặp
+              name: `image-${index}`, // Đặt tên khác nhau cho từng hình ảnh
+              status: "done",
+              url: urlImg,
+            });
+          });
+          setFileList((prev) => [...prev, ...imgs]);
+        }
       }
     } catch (error) {
       console.log(error);
@@ -80,13 +109,33 @@ const AddProduct = () => {
     console.log(values.categories);
     values.content = content;
     values.slug = replaceName(values.title);
-    if (files.length > 0) {
-      const uploadPromises = Object.keys(files).map(async (i) => {
-        const index = parseInt(i);
-        const url = await uploadFile(files[index]);
-        return url;
+    // if (files.length > 0) {
+    //   const uploadPromises = Object.keys(files).map(async (i) => {
+    //     const index = parseInt(i);
+    //     const url = await uploadFile(files[index]);
+    //     return url;
+    //   });
+    //   values.images = await Promise.all(uploadPromises);
+    // }
+    if (fileList && fileList.length > 0) {
+      const files: any[] = [];
+      let imagesUrl: string[] = [];
+      fileList.forEach((file, _index) => {
+        if (file.originFileObj) files.push(file.originFileObj);
+        else imagesUrl.push(file.url);
       });
-      values.images = await Promise.all(uploadPromises);
+      if (files && files.length > 0) {
+        const uploadedFilesUrl:string[] | null = await uploadFiles(files);
+        if(uploadedFilesUrl&& uploadedFilesUrl.length>0){
+          imagesUrl = [...imagesUrl, ...uploadedFilesUrl]; 
+        }
+      }
+      if (imagesUrl && imagesUrl.length > 0) {
+        values.images = imagesUrl;
+      } else {
+        setIsLoading(false);
+        return;
+      }
     }
     const api = idProduct ? `${API.PRODUCTS}/${idProduct}` : API.PRODUCTS;
     try {
@@ -102,7 +151,7 @@ const AddProduct = () => {
         setIdProduct(null);
         navigate("/inventory");
       }
-      setContent('');
+      setContent("");
     } catch (error: any) {
       console.log(error);
       message.error(error.message);
@@ -274,7 +323,18 @@ const AddProduct = () => {
                 ></TreeSelect>
               </Form.Item>
             </Card>
-            <Card
+            <Card>
+              <Upload
+                multiple
+                fileList={fileList}
+                accept="image/*"
+                listType="picture-card"
+                onChange={handleChange}
+              >
+                Upload
+              </Upload>
+            </Card>
+            {/* <Card
               title={"Images"}
               extra={
                 <Button
@@ -301,14 +361,14 @@ const AddProduct = () => {
                   })}
                 </Image.PreviewGroup>
               )}
-            </Card>
+            </Card> */}
             <Card>
               <Space>
                 <Button
                   disabled={isLoading}
                   onClick={() => {
                     form.resetFields();
-                    setContent('');
+                    setContent("");
                   }}
                 >
                   Cancel
@@ -343,7 +403,7 @@ const AddProduct = () => {
           </div>
         </div>
       </Form>
-      <div className="d-none">
+      {/* <div className="d-none">
         <input
           type="file"
           multiple
@@ -351,7 +411,7 @@ const AddProduct = () => {
           ref={inputFileRef}
           onChange={(values: any) => setFiles(values.target.files)}
         ></input>
-      </div>
+      </div> */}
       <ModalCategory
         values={categories}
         visible={isVisibleCategory}

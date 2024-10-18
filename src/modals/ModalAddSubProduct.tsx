@@ -45,12 +45,22 @@ const ModalAddSubProduct = (props: Props) => {
     if (product){
       setIsLoading(true);
       values.productId=product.id;
-      if(fileList && fileList.length > 0){
-        const files:any[] = fileList.map((file: any)=> file.originFileObj);
-        const imagesUrl: string[] | null = await uploadFiles(files);
-        if(imagesUrl && imagesUrl.length> 0){
-          values.images= imagesUrl;
-        }else{
+      if (fileList && fileList.length > 0) {
+        const files: any[] = [];
+        let imagesUrl: string[] = [];
+        fileList.forEach((file, _index) => {
+          if (file.originFileObj) files.push(file.originFileObj);
+          else imagesUrl.push(file.url);
+        });
+        if (files && files.length > 0) {
+          const uploadedFilesUrl:string[] | null = await uploadFiles(files);
+          if(uploadedFilesUrl&& uploadedFilesUrl.length>0){
+            imagesUrl = [...imagesUrl, ...uploadedFilesUrl]; 
+          }
+        }
+        if (imagesUrl && imagesUrl.length > 0) {
+          values.images = imagesUrl;
+        } else {
           setIsLoading(false);
           return;
         }
@@ -74,13 +84,13 @@ const ModalAddSubProduct = (props: Props) => {
   const handleChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
     const items = newFileList.map(
       (item) =>
-        item.originFileObj && {
+        item.originFileObj ? {
           ...item,
           url: item.originFileObj
             ? URL.createObjectURL(item.originFileObj)
             : "",
           status: "done",
-        }
+        }: {...item}
     );
     setFileList(items);
   };

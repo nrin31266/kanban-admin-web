@@ -108,7 +108,7 @@ const InventoryScreen = () => {
       key: "images",
       dataIndex: "images",
       title: "Image",
-      width: 300,
+      width: 285,
       render: (images: string[]) =>
         images && images.length > 0 ? (
           <div
@@ -122,9 +122,13 @@ const InventoryScreen = () => {
               <Image
                 key={`image-${index}`} 
                 src={img}
-                width={"50px"}
-                height={"50px"}
-                style={{ borderRadius: "4px" }} 
+                width={"80px"}
+                height={"80px"}
+                style={{ 
+                  borderRadius: "6px",
+                  border: '1px solid silver'
+                 }}
+                 
               />
             ))}
           </div>
