@@ -11,36 +11,25 @@ import {
   message,
   Select,
   Space,
-  Spin,
   TreeSelect,
   Typography,
 } from "antd";
 import handleAPI from "../../../apis/handleAPI";
 import { API, colors } from "../../../configurations/configurations";
-import {
-  SelectModel,
-  TreeModel,
-  TreeModelChildren,
-} from "./../../../models/FormModel";
+import { SelectModel, TreeModel } from "./../../../models/FormModel";
 import { SupplierModel } from "../../../models/SupplierModel";
-import { replace } from "react-router-dom";
+import { replace, useNavigate, useSearchParams } from "react-router-dom";
 import { replaceName } from "../../../utils/replaceName";
 import { uploadFile } from "../../../utils/uploadFile";
 import { AddSquare } from "iconsax-react";
 import { ModalCategory } from "../../../modals";
-import { ProductModel } from './../../../models/Products';
+import { ProductModel } from "./../../../models/Products";
 
-const { Text, Title, Paragraph } = Typography;
-const initContent = {
-  title: "",
-  description: "",
-  supplier: "",
-};
+const { Title } = Typography;
 
 const AddProduct = () => {
   const [isInitLoading, setIsInitLoading] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [content, setContent] = useState("");
   const [suppliersOption, setSuppliersOption] = useState<SelectModel[]>();
   const editorRef = useRef<any>(null);
   const [form] = Form.useForm();
@@ -48,37 +37,79 @@ const AddProduct = () => {
   const [isVisibleCategory, setIsVisibleCategory] = useState(false);
   const [categories, setCategories] = useState<TreeModel[]>([]);
   const [files, setFiles] = useState<any[]>([]);
-  const inputFileRef = useRef<any>(null); 
+  const inputFileRef = useRef<any>(null);
+  const [content, setContent] = useState<string>("");
+  const [searchPrams] = useSearchParams();
+  const [idProduct, setIdProduct] = useState<string | null>("");
+  const navigate = useNavigate();
 
-  const handleAddNewProduct = async (values: ProductModel) => {
-    setIsLoading(true);
-    const content = editorRef.current.getContent();
-    values.content = content;
-    values.slug = replaceName(values.title); 
-    if (files.length > 0) {
-      const uploadPromises = Object.keys(files).map(async (i) => {
-          const index = parseInt(i);
-          const url = await uploadFile(files[index]);
-          return url;
-      });
-      values.images = await Promise.all(uploadPromises);
-  }
+  useEffect(() => {
+    if (searchPrams.get("id")) {
+      const id: string | null = searchPrams.get("id");
+      setIdProduct(id);
+    }
+    getData();
+  }, []);
+
+  useEffect(() => {
+    if (idProduct) {
+      console.log(idProduct);
+      getProduct(idProduct);
+    }
+  }, [idProduct]);
+
+  const getProduct = async (idProduct: string) => {
     try {
-      const res = await handleAPI(API.PRODUCTS, values, 'post');
-      message.success(`Add product with name '${values.title}' successfully!`);
-      form.resetFields();
-      editorRef.current.setContent('');
+      const res = await handleAPI(`${API.PRODUCTS}/${idProduct}`);
+      const item: ProductModel = res.data.result;
+      if (item) {
+        console.log(item);
+        const { categories, ...filterItem } = item;
+        const listIdCategories = categories.map((values, _index) => values.id);
+        form.setFieldsValue(filterItem);
+        form.setFieldValue("categories", listIdCategories);
+        setContent(filterItem.content);
+      }
     } catch (error) {
       console.log(error);
-      message.error('An error occurred when adding a product!');
-    }finally{
-      setIsLoading(false);
     }
   };
 
-  useEffect(() => {
-    getData();
-  }, []);
+  const handleAddNewProduct = async (values: ProductModel) => {
+    setIsLoading(true);
+    console.log(values.categories);
+    values.content = content;
+    values.slug = replaceName(values.title);
+    if (files.length > 0) {
+      const uploadPromises = Object.keys(files).map(async (i) => {
+        const index = parseInt(i);
+        const url = await uploadFile(files[index]);
+        return url;
+      });
+      values.images = await Promise.all(uploadPromises);
+    }
+    const api = idProduct ? `${API.PRODUCTS}/${idProduct}` : API.PRODUCTS;
+    try {
+      const res = await handleAPI(api, values, idProduct ? "put" : "post");
+      console.log(res.data);
+      message.success(
+        `${idProduct ? "Update" : "Add"} product with name '${
+          values.title
+        }' successfully!`
+      );
+      form.resetFields();
+      if (idProduct) {
+        setIdProduct(null);
+        navigate("/inventory");
+      }
+      setContent('');
+    } catch (error: any) {
+      console.log(error);
+      message.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const getData = async () => {
     setIsInitLoading(true);
@@ -112,7 +143,9 @@ const AddProduct = () => {
     </div>
   ) : (
     <div className="container">
-      <Title level={3}>Add new product</Title>
+      <Title level={3}>
+        {idProduct ? "Update product" : "Add new product"}
+      </Title>
       <Form
         disabled={isLoading}
         size="large"
@@ -170,7 +203,7 @@ const AddProduct = () => {
             </Form.Item>
 
             <Editor
-              onBlur={(_evt, editor) => (editorRef.current = editor)}
+              onInit={(_evt, editor) => (editorRef.current = editor)}
               apiKey="ih07bjaxxgp5ywku0piogyodrxm13wttrpxz59qydzru6vpj"
               init={{
                 plugins: [
@@ -198,7 +231,10 @@ const AddProduct = () => {
                   { value: "Email", title: "Email" },
                 ],
               }}
-              initialValue={content}
+              value={content} // Đảm bảo content đã được khởi tạo
+              onEditorChange={(newContent, _editor) => {
+                setContent(newContent); // Cập nhật trạng thái khi nội dung thay đổi
+              }}
             />
           </div>
           <div className="col-md-4">
@@ -214,7 +250,9 @@ const AddProduct = () => {
               >
                 <TreeSelect
                   filterTreeNode={(input, treeNode) =>
-                    replaceName(treeNode.props.title).includes(replaceName(input))
+                    replaceName(treeNode.props.title).includes(
+                      replaceName(input)
+                    )
                   }
                   multiple
                   allowClear
@@ -236,23 +274,33 @@ const AddProduct = () => {
                 ></TreeSelect>
               </Form.Item>
             </Card>
-            <Card title={'Images'} extra={
-              <Button size="small" onClick={()=>inputFileRef.current.click()}>Upload images</Button>
-            }>
-              {
-                files.length > 0 &&
-                <Image.PreviewGroup>
-                  {
-                    Object.keys(files).map((i) => {
-                      const index = parseInt(i);
-                      return <Image style={{
-                        border: '1px solid silver'
-                      }} width={'50%'} src={URL.createObjectURL(files[index])}/>
-                    })
-                  }
-                </Image.PreviewGroup>
+            <Card
+              title={"Images"}
+              extra={
+                <Button
+                  size="small"
+                  onClick={() => inputFileRef.current.click()}
+                >
+                  Upload images
+                </Button>
               }
-              
+            >
+              {files.length > 0 && (
+                <Image.PreviewGroup>
+                  {Object.keys(files).map((i) => {
+                    const index = parseInt(i);
+                    return (
+                      <Image
+                        style={{
+                          border: "1px solid silver",
+                        }}
+                        width={"50%"}
+                        src={URL.createObjectURL(files[index])}
+                      />
+                    );
+                  })}
+                </Image.PreviewGroup>
+              )}
             </Card>
             <Card>
               <Space>
@@ -260,13 +308,17 @@ const AddProduct = () => {
                   disabled={isLoading}
                   onClick={() => {
                     form.resetFields();
-                    editorRef.current = null;
+                    setContent('');
                   }}
                 >
                   Cancel
                 </Button>
-                <Button loading={isLoading} type="primary" onClick={() => form.submit()}>
-                  Submit
+                <Button
+                  loading={isLoading}
+                  type="primary"
+                  onClick={() => form.submit()}
+                >
+                  {idProduct ? "Update" : "Submit"}
                 </Button>
               </Space>
             </Card>
@@ -292,8 +344,13 @@ const AddProduct = () => {
         </div>
       </Form>
       <div className="d-none">
-        <input type="file" multiple accept="image/*" ref={inputFileRef} 
-        onChange={(values: any)=> setFiles(values.target.files)}></input>
+        <input
+          type="file"
+          multiple
+          accept="image/*"
+          ref={inputFileRef}
+          onChange={(values: any) => setFiles(values.target.files)}
+        ></input>
       </div>
       <ModalCategory
         values={categories}

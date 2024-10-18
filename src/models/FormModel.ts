@@ -34,7 +34,7 @@ export interface TreeModelChildren{
 export interface TreeModel {
   title: string,
   value: string,
-  style?:any
-  disabled?: boolean
   children?:TreeModelChildren[]
+  disabled?: boolean 
+  style?:any
 }

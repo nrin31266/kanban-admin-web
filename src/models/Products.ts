@@ -1,3 +1,5 @@
+import { TreeModel } from "./FormModel";
+
 export interface CategoryModel {
   id: string;
   name: string;
@@ -30,7 +32,7 @@ export interface ProductModel {
   categories: CategoryModel[]
   createdAt: string
   updatedAt: string
-  subProductResponse: SubProductModel[];
+  subProductResponse?: SubProductModel[];
 }
 
 export interface SubProductModel {

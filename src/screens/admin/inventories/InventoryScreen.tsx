@@ -8,7 +8,7 @@ import {
 import handleAPI from "../../../apis/handleAPI";
 import { API, colors } from "../../../configurations/configurations";
 import { ColumnProps } from "antd/es/table";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { listColors } from "../../../constants/listColors";
 import { MdLibraryAdd } from "react-icons/md";
 import { ModalAddSubProduct } from "../../../modals";
@@ -19,9 +19,10 @@ const InventoryScreen = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isInitLoading, setIsInitLoading] = useState<boolean>(false);
   const [products, setProducts] = useState<ProductModel[]>([]);
-  const [isVisibleModalAddSubProduct, setIsVisibleModalAddSubProduct] =
-    useState<boolean>(false);
+  const [isVisibleModalAddSubProduct, setIsVisibleModalAddSubProduct] =useState<boolean>(false);
   const [productSelected, setProductSelected] = useState<ProductModel>();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     getProducts();
@@ -75,14 +76,23 @@ const InventoryScreen = () => {
       key: "categories",
       dataIndex: "categories",
       title: "Categories",
-      width: 200,
+      width: 300,
       render: (categories: CategoryModel[]) =>
         categories &&
         categories.length > 0 && (
-          <Space>
+          <div style={{
+            display: "flex",
+            flexWrap: "wrap", // Cho phép hình ảnh tự động xuống hàng
+            gap: "4px", // Khoảng cách giữa các hình ảnh
+            
+          }}>
             {categories.map((category: CategoryModel, _index) => (
               <Link to={"/categories/detail/${item.slug}?id=${item.key}"}>
-                <Tag
+                <Tag style={{
+                  margin: '0',
+                  padding: '5px',
+                  fontSize: '15px'
+                }}
                   color={
                     listColors[Math.floor(Math.random() * listColors.length)]
                   }
@@ -91,7 +101,7 @@ const InventoryScreen = () => {
                 </Tag>
               </Link>
             ))}
-          </Space>
+          </div>
         ),
     },
     {
@@ -108,13 +118,13 @@ const InventoryScreen = () => {
               gap: "4px", // Khoảng cách giữa các hình ảnh
             }}
           >
-            {images.map((img, _index) => (
+            {images.map((img, index) => (
               <Image
-                key={`image-${_index}`} // Thêm key để đảm bảo tính duy nhất cho từng hình ảnh
+                key={`image-${index}`} 
                 src={img}
                 width={"50px"}
                 height={"50px"}
-                style={{ borderRadius: "4px" }} // Nếu bạn muốn hình ảnh có viền mềm mại hơn
+                style={{ borderRadius: "4px" }} 
               />
             ))}
           </div>
@@ -127,10 +137,10 @@ const InventoryScreen = () => {
       key: "colors",
       dataIndex: "subProductResponse",
       title: "Color",
-      width: 120,
+      width: 200,
       render: (items: SubProductModel[]) => {
         if (!items || items.length === 0) {
-          return <span className="text-secondary">No color</span>; // Không có gì để hiển thị
+          return <span className="text-secondary">No color</span>; 
         }
 
         const colors: string[] = [];
@@ -154,11 +164,11 @@ const InventoryScreen = () => {
                   <div
                     style={{
                       margin: "2px",
-                      width: 24,
-                      height: 24,
+                      width: 30,
+                      height: 30,
                       backgroundColor: color,
-                      borderRadius: 12,
-                      border: "1px solid #000", // Thêm viền nếu muốn nhìn rõ màu
+                      borderRadius: '5%',
+                      border: '1 solid black'
                     }}
                     key={`color-${color}-${index}`}
                   />
@@ -173,16 +183,20 @@ const InventoryScreen = () => {
       key: "sizes",
       dataIndex: "subProductResponse",
       title: "Sizes",
-      width: 200,
+      width: 300,
       render: (items: SubProductModel[]) => {
         if (!items || items.length === 0) {
-          return <span className="text-secondary">No size</span>; // Không có gì để hiển thị
+          return <span className="text-secondary">No size</span>; 
         }
         return (
           <Space wrap>
             {items.length > 0 &&
               items.map((item, index) => (
-                <Tag key={`size${item.size}-${index}`}>{item.size}</Tag>
+                <Tag style={{
+                  margin: '0',
+                  padding: '5px',
+                  fontSize: '15px'
+                }} key={`size${item.size}-${index}`}>{item.size}</Tag>
               ))}
           </Space>
         );
@@ -269,6 +283,7 @@ const InventoryScreen = () => {
               type="text"
               onClick={() => {
                 setProductSelected(product);
+                navigate(`/inventory/add-product?id=${product.id}`)
                 console.log(productSelected);
               }}
             >
