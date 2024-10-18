@@ -64,11 +64,11 @@
 .affix-sider .sider-component {
   height: 100vh;
 }
-.loader{
+.loader {
   display: flex;
-  justify-content: center; 
-  align-items: center; 
-  height: 50vh; 
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
 }
 
 .loader span {
@@ -80,9 +80,17 @@
   box-sizing: border-box;
   animation: rotation 1s linear infinite;
   display: inline;
-  
 }
 
+.text-2-line {
+  display: -webkit-box; /* Sử dụng flexbox để điều chỉnh hiển thị */
+  -webkit-box-orient: vertical; /* Định hướng theo chiều dọc */
+  -webkit-line-clamp: 2; /* Chỉ hiển thị 2 dòng */
+  overflow: hidden; /* Ẩn phần văn bản vượt quá */
+  text-overflow: ellipsis; /* Hiển thị dấu ba chấm */
+  line-height: 1.5; /* Thiết lập chiều cao dòng */
+  max-height: 3em; /* Tối đa chiều cao cho 2 dòng */
+}
 
 @keyframes rotation {
   0% {
@@ -99,17 +107,18 @@
     display: none;
   }
 
-  .main-content {}
+  .main-content {
+  }
 }
 
-
-
-
 /* Màn hình trung bình (ví dụ: tablet, từ 576px đến 767px) */
-@media (min-width: 576px) and (max-width: 767.98px) {}
+@media (min-width: 576px) and (max-width: 767.98px) {
+}
 
 /* Màn hình lớn (ví dụ: desktop, từ 768px đến 991px) */
-@media (min-width: 768px) and (max-width: 991.98px) {}
+@media (min-width: 768px) and (max-width: 991.98px) {
+}
 
 /* Màn hình rất lớn (ví dụ: desktop lớn, từ 992px trở lên) */
-@media (min-width: 992px) {}
+@media (min-width: 992px) {
+}

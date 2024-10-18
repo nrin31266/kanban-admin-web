@@ -1,4 +1,14 @@
-import { Avatar, Button, Image, message, Modal, Space, Table, Tag, Tooltip } from "antd";
+import {
+  Avatar,
+  Button,
+  Image,
+  message,
+  Modal,
+  Space,
+  Table,
+  Tag,
+  Tooltip,
+} from "antd";
 import React, { useEffect, useState } from "react";
 import {
   CategoryModel,
@@ -19,7 +29,8 @@ const InventoryScreen = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isInitLoading, setIsInitLoading] = useState<boolean>(false);
   const [products, setProducts] = useState<ProductModel[]>([]);
-  const [isVisibleModalAddSubProduct, setIsVisibleModalAddSubProduct] =useState<boolean>(false);
+  const [isVisibleModalAddSubProduct, setIsVisibleModalAddSubProduct] =
+    useState<boolean>(false);
   const [productSelected, setProductSelected] = useState<ProductModel>();
 
   const navigate = useNavigate();
@@ -43,9 +54,15 @@ const InventoryScreen = () => {
   const handleRemoveProduct = async (productId: string) => {
     setIsLoading(true);
     try {
-      const res = await handleAPI(`${API.PRODUCTS}/${productId}`, undefined, 'delete');
+      const res = await handleAPI(
+        `${API.PRODUCTS}/${productId}`,
+        undefined,
+        "delete"
+      );
       console.log(res);
-      res.data.result ? message.success(res.data.message) : message.error(res.data.message);      
+      res.data.result
+        ? message.success(res.data.message)
+        : message.error(res.data.message);
       getProducts();
     } catch (error) {
       console.log(error);
@@ -70,39 +87,12 @@ const InventoryScreen = () => {
       key: "description",
       dataIndex: "description",
       title: "Description",
-      width: 300,
-    },
-    {
-      key: "categories",
-      dataIndex: "categories",
-      title: "Categories",
-      width: 300,
-      render: (categories: CategoryModel[]) =>
-        categories &&
-        categories.length > 0 && (
-          <div style={{
-            display: "flex",
-            flexWrap: "wrap", // Cho phép hình ảnh tự động xuống hàng
-            gap: "4px", // Khoảng cách giữa các hình ảnh
-            
-          }}>
-            {categories.map((category: CategoryModel, _index) => (
-              <Link to={"/categories/detail/${item.slug}?id=${item.key}"}>
-                <Tag style={{
-                  margin: '0',
-                  padding: '5px',
-                  fontSize: '15px'
-                }}
-                  color={
-                    listColors[Math.floor(Math.random() * listColors.length)]
-                  }
-                >
-                  {category.name}
-                </Tag>
-              </Link>
-            ))}
-          </div>
-        ),
+      width: 250,
+      render: (description) => (
+        <Tooltip title={description}>
+          <div className="text-2-line">{description}</div>
+        </Tooltip>
+      ),
     },
     {
       key: "images",
@@ -120,15 +110,14 @@ const InventoryScreen = () => {
           >
             {images.map((img, index) => (
               <Image
-                key={`image-${index}`} 
+                key={`image-${index}`}
                 src={img}
-                width={"80px"}
-                height={"80px"}
-                style={{ 
-                  borderRadius: "6px",
-                  border: '1px solid silver'
-                 }}
-                 
+                width={"48px"}
+                height={"48px"}
+                style={{
+                  borderRadius: "10px",
+                  border: "1px solid silver",
+                }}
               />
             ))}
           </div>
@@ -136,6 +125,41 @@ const InventoryScreen = () => {
           <span className="text-secondary">No image</span>
         ),
     },
+    {
+      key: "categories",
+      dataIndex: "categories",
+      title: "Categories",
+      width: 300,
+      render: (categories: CategoryModel[]) =>
+        categories &&
+        categories.length > 0 && (
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap", // Cho phép hình ảnh tự động xuống hàng
+              gap: "4px", // Khoảng cách giữa các hình ảnh
+            }}
+          >
+            {categories.map((category: CategoryModel, _index) => (
+              <Link to={"/categories/detail/${item.slug}?id=${item.key}"}>
+                <Tag
+                  style={{
+                    margin: "0",
+                    padding: "5px",
+                    fontSize: "15px",
+                  }}
+                  color={
+                    listColors[Math.floor(Math.random() * listColors.length)]
+                  }
+                >
+                  {category.name}
+                </Tag>
+              </Link>
+            ))}
+          </div>
+        ),
+    },
+    
 
     {
       key: "colors",
@@ -144,7 +168,7 @@ const InventoryScreen = () => {
       width: 200,
       render: (items: SubProductModel[]) => {
         if (!items || items.length === 0) {
-          return <span className="text-secondary">No color</span>; 
+          return <span className="text-secondary">No color</span>;
         }
 
         const colors: string[] = [];
@@ -171,8 +195,8 @@ const InventoryScreen = () => {
                       width: 30,
                       height: 30,
                       backgroundColor: color,
-                      borderRadius: '5%',
-                      border: '1 solid black'
+                      borderRadius: "5%",
+                      border: "1px solid black",
                     }}
                     key={`color-${color}-${index}`}
                   />
@@ -182,6 +206,7 @@ const InventoryScreen = () => {
         );
       },
     },
+    
 
     {
       key: "sizes",
@@ -190,17 +215,22 @@ const InventoryScreen = () => {
       width: 300,
       render: (items: SubProductModel[]) => {
         if (!items || items.length === 0) {
-          return <span className="text-secondary">No size</span>; 
+          return <span className="text-secondary">No size</span>;
         }
         return (
           <Space wrap>
             {items.length > 0 &&
               items.map((item, index) => (
-                <Tag style={{
-                  margin: '0',
-                  padding: '5px',
-                  fontSize: '15px'
-                }} key={`size${item.size}-${index}`}>{item.size}</Tag>
+                <Tag
+                  style={{
+                    margin: "0",
+                    padding: "5px",
+                    fontSize: "15px",
+                  }}
+                  key={`size${item.size}-${index}`}
+                >
+                  {item.size}
+                </Tag>
               ))}
           </Space>
         );
@@ -210,7 +240,7 @@ const InventoryScreen = () => {
       key: "prices",
       dataIndex: "subProductResponse",
       title: "Prices",
-      width: 200,
+      width: 250,
       render: (items: SubProductModel[]) => {
         if (!items || items.length === 0) {
           return <span className="text-secondary">N/A</span>;
@@ -287,7 +317,7 @@ const InventoryScreen = () => {
               type="text"
               onClick={() => {
                 setProductSelected(product);
-                navigate(`/inventory/add-product?id=${product.id}`)
+                navigate(`/inventory/add-product?id=${product.id}`);
                 console.log(productSelected);
               }}
             >
@@ -295,14 +325,20 @@ const InventoryScreen = () => {
             </Button>
           </Tooltip>
           <Tooltip title={"Delete product"} key={"btnDelete"}>
-            <Button className="p-0" size="small" type="text" onClick={() => {
-              confirm({
-                title: 'Confirm',
-                content: 'Are you sure to delete the product, any by-products will be lost!',
-                onOk: ()=> handleRemoveProduct(product.id),
-                onCancel: () => console.log('Cancel')
-              })
-            }}>
+            <Button
+              className="p-0"
+              size="small"
+              type="text"
+              onClick={() => {
+                confirm({
+                  title: "Confirm",
+                  content:
+                    "Are you sure to delete the product, any by-products will be lost!",
+                  onOk: () => handleRemoveProduct(product.id),
+                  onCancel: () => console.log("Cancel"),
+                });
+              }}
+            >
               <Trash className="text-danger" size={20} />
             </Button>
           </Tooltip>

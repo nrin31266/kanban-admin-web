@@ -1,8 +1,11 @@
+import { Button } from 'antd'
 import React from 'react'
 
 const ManageStoreScreen = () => {
   return (
-    <div>ManageStoreScreen</div>
+    <>
+      
+    </>
   )
 }
 
