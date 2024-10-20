@@ -8,6 +8,7 @@ import {
   Table,
   Tag,
   Tooltip,
+  Typography,
 } from "antd";
 import React, { useEffect, useState } from "react";
 import {
@@ -17,13 +18,18 @@ import {
 } from "../../../models/Products";
 import handleAPI from "../../../apis/handleAPI";
 import { API, colors } from "../../../configurations/configurations";
-import { ColumnProps } from "antd/es/table";
+import { ColumnProps, TableProps } from "antd/es/table";
 import { Link, useNavigate } from "react-router-dom";
 import { listColors } from "../../../constants/listColors";
 import { MdLibraryAdd } from "react-icons/md";
 import { ModalAddSubProduct } from "../../../modals";
 import { Edit2, Trash } from "iconsax-react";
+import { sign } from "crypto";
+import { PaginationResponseModel } from "../../../models/AppModel";
 const { confirm } = Modal;
+
+type TableRowSelection<T extends object = object> =
+  TableProps<T>["rowSelection"];
 
 const InventoryScreen = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -31,19 +37,41 @@ const InventoryScreen = () => {
   const [products, setProducts] = useState<ProductModel[]>([]);
   const [isVisibleModalAddSubProduct, setIsVisibleModalAddSubProduct] =
     useState<boolean>(false);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [productSelected, setProductSelected] = useState<ProductModel>();
+
+  const [paginationPage, setPaginationPage] = useState<number>(1);
+  const [paginationSize, setPaginationSize] = useState<number>(10); 
+
+  const [total, setTotal] = useState<number>(0);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     getProducts();
   }, []);
+
+  useEffect(() => {
+    getProducts();
+  }, [paginationPage, paginationSize]);
+
+  useEffect(() => {
+    console.log(selectedRowKeys);
+  }, [selectedRowKeys]);
+
   const getProducts = async () => {
     setIsLoading(true);
+    let api = `${API.PRODUCTS}/data?page=${paginationPage}&size=${paginationSize}`;
     try {
-      const res = await handleAPI(`${API.PRODUCTS}/data`);
-      console.log(res.data.result);
-      setProducts(res.data.result);
+      const res = await handleAPI(api);
+      const paginationRes : PaginationResponseModel = res.data.result;
+      setTotal(paginationRes.totalElements);
+      setProducts(
+        paginationRes.data.map((item: ProductModel) => ({
+          ...item,
+          key: item.id,
+        }))
+      );
     } catch (error) {
       console.log(error);
     } finally {
@@ -71,7 +99,25 @@ const InventoryScreen = () => {
     }
   };
 
+  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+
+  const rowSelection: TableRowSelection<ProductModel> = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  };
+
   const columns: ColumnProps<ProductModel>[] = [
+    {
+      key: "index",
+      dataIndex: undefined,
+      width: 60,
+      title: "#",
+      render: (_, __, index) => {
+        return ((paginationPage-1) * paginationSize + (index + 1));
+      },
+    },
     {
       key: "title",
       dataIndex: "",
@@ -159,7 +205,6 @@ const InventoryScreen = () => {
           </div>
         ),
     },
-    
 
     {
       key: "colors",
@@ -206,7 +251,6 @@ const InventoryScreen = () => {
         );
       },
     },
-    
 
     {
       key: "sizes",
@@ -350,15 +394,38 @@ const InventoryScreen = () => {
 
   return (
     <>
-      <Table
-        bordered
-        dataSource={products}
-        columns={columns}
-        loading={isLoading}
-        scroll={{
-          y: "calc(100vh - 245px)",
-        }}
-      ></Table>
+      <div className="col">
+        <div className="row">
+          {selectedRowKeys.length > -1 && (
+            <Typography.Text>
+              {selectedRowKeys.length} items selected
+            </Typography.Text>
+          )}
+        </div>
+        <div className="row">
+          <Table
+            pagination={{
+              showQuickJumper: false,
+              showSizeChanger: true,
+              onShowSizeChange: (_current, size) => {
+                setPaginationSize(size);
+              },
+              total: total,
+              onChange: (page, _pageSize)=>{
+                setPaginationPage(page);
+              }
+            }}
+            rowSelection={rowSelection}
+            bordered
+            dataSource={products}
+            columns={columns}
+            loading={isLoading}
+            scroll={{
+              y: "calc(100vh - 245px)",
+            }}
+          ></Table>
+        </div>
+      </div>
       <ModalAddSubProduct
         onAddNew={(values: SubProductModel) => {
           getProducts();
