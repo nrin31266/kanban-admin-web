@@ -2,9 +2,11 @@ import {
   Avatar,
   Button,
   Image,
+  Input,
   message,
   Modal,
   Space,
+  Spin,
   Table,
   Tag,
   Tooltip,
@@ -23,9 +25,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { listColors } from "../../../constants/listColors";
 import { MdLibraryAdd } from "react-icons/md";
 import { ModalAddSubProduct } from "../../../modals";
-import { Edit2, Trash } from "iconsax-react";
-import { sign } from "crypto";
+import { Edit2, Sort, Trash } from "iconsax-react";
+import { TiTick } from "react-icons/ti";
 import { PaginationResponseModel } from "../../../models/AppModel";
+import { replaceName } from "../../../utils/replaceName";
 const { confirm } = Modal;
 
 type TableRowSelection<T extends object = object> =
@@ -45,6 +48,7 @@ const InventoryScreen = () => {
   const [allowSelectRows, setAllowSelectRows] = useState<boolean>(false);
 
   const [total, setTotal] = useState<number>(0);
+  const [searchKey, setSearchKey] = useState<string>("");
 
   const navigate = useNavigate();
 
@@ -53,32 +57,66 @@ const InventoryScreen = () => {
   }, []);
 
   useEffect(() => {
-    getProducts();
-  }, [paginationPage, paginationSize]);
+    let api;
+    if (searchKey.length >= 4) {
+      api = `${API.PRODUCTS}/data?title=${searchKey}&page=${paginationPage}&size=${paginationSize}`;
+    } else {
+      api = `${API.PRODUCTS}/data?page=${paginationPage}&size=${paginationSize}`;
+    }
+    console.log("useEffect triggered with api:", api);
+    getProducts(api);
+  }, [paginationPage, paginationSize, searchKey]);
 
-  useEffect(() => {
-    console.log(selectedRowKeys);
-  }, [selectedRowKeys]);
+  const handleSearchProduct = (key: string) => {
+    
+    if (key.trim() === "") {
+      return;
+    }
+    if (key.length < 4) {
+      message.warning("Please enter at least 4 characters to search!");
+      return;
+    }
 
-  const getProducts = async () => {
+    let keySearch:string = replaceName(key);
+    console.log("Key search:", keySearch);
+    if(keySearch===searchKey){return;}
     setIsLoading(true);
-    let api = `${API.PRODUCTS}/data?page=${paginationPage}&size=${paginationSize}`;
+    setPaginationPage(1);
+    setSearchKey(keySearch);
+    
+  };
+
+  const getProducts = async (api?: string) => {
+    setIsLoading(true);
+    console.log("getProducts called, api:", api);
+    if (!api) {
+      api = `${API.PRODUCTS}/data?page=${paginationPage}&size=${paginationSize}`;
+    }
+    
+    console.log("isLoading set to true");
     try {
       const res = await handleAPI(api);
       const paginationRes: PaginationResponseModel = res.data.result;
-      setTotal(paginationRes.totalElements);
+
       setProducts(
         paginationRes.data.map((item: ProductModel) => ({
           ...item,
           key: item.id,
         }))
       );
+      console.log(paginationRes.data);
+      setTotal(paginationRes.totalElements);
     } catch (error) {
       console.log(error);
     } finally {
+      console.log("isLoading set to false");
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    console.log(selectedRowKeys);
+  }, [selectedRowKeys]);
 
   const handleSoftRemoveProduct = async (productIds: string[]) => {
     setIsLoading(true);
@@ -96,7 +134,6 @@ const InventoryScreen = () => {
       setIsLoading(false);
     }
   };
-  
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(newSelectedRowKeys);
@@ -105,6 +142,7 @@ const InventoryScreen = () => {
   const handleSelectAll = async () => {
     setAllowSelectRows(true);
     let api = `${API.PRODUCTS}/data`;
+    setIsLoading(true);
     try {
       const res = await handleAPI(api);
       const paginationRes: PaginationResponseModel = res.data.result;
@@ -116,6 +154,8 @@ const InventoryScreen = () => {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -210,9 +250,9 @@ const InventoryScreen = () => {
                     padding: "5px",
                     fontSize: "15px",
                   }}
-                  color={
-                    listColors[Math.floor(Math.random() * listColors.length)]
-                  }
+                  // color={
+                  //   listColors[Math.floor(Math.random() * listColors.length)]
+                  // }
                 >
                   {category.name}
                 </Tag>
@@ -412,68 +452,126 @@ const InventoryScreen = () => {
     <>
       <div className="col">
         <div className="row">
-          {
-
-          }
-          <Space>
-            {
-              <Button type="text"  onClick={()=>{
-                if(allowSelectRows) {
-                  setAllowSelectRows(false);
-                  setSelectedRowKeys([]);
-                } else setAllowSelectRows(true);
-              }}>
-                Allow select
-              </Button>
-            }
-            {selectedRowKeys.length > 0 && (
-              <>
-                <Typography.Text>
-                  {selectedRowKeys.length} items selected
-                </Typography.Text>
-                <Tooltip title="Delete products">
-                  <Button type="text" className="text-danger" onClick={()=>{
-                    confirm({
-                      title: "Confirm",
-                      content: "Delete all rows selected?",
-                      onCancel: () =>console.log("Cancel"),
-                      onOk: ()=> {
-                        handleSoftRemoveProduct(selectedRowKeys as string[])
+          <div className="col text-left">
+            <div className="row">
+              <Typography.Title className="mb-0" level={4}>
+                Products
+              </Typography.Title>
+            </div>
+            <div className="row">
+              <Space>
+                {
+                  <Button
+                    type="text"
+                    className="text-primary p-0"
+                    style={{
+                      height: "auto",
+                    }}
+                    onClick={() => {
+                      if (allowSelectRows) {
+                        setAllowSelectRows(false);
                         setSelectedRowKeys([]);
-                      }
-                    })
-                  }}>
-                    Delete rows selected
+                      } else setAllowSelectRows(true);
+                    }}
+                  >
+                    Allow select{" "}
+                    {allowSelectRows && (
+                      <TiTick className="text-primary p-0" size={15} />
+                    )}
                   </Button>
-                </Tooltip>
-              </>
-            )}
-            {selectedRowKeys.length > -1 && selectedRowKeys.length < total && (
-              <Button type="link" onClick={handleSelectAll}>
-                Select all
+                }
+                {selectedRowKeys.length > 0 && (
+                  <>
+                    <Typography.Text>
+                      {selectedRowKeys.length} items selected
+                    </Typography.Text>
+                    <Tooltip title="Delete products">
+                      <Button
+                        style={{
+                          height: "auto",
+                        }}
+                        type="text"
+                        className="text-danger p-0"
+                        onClick={() => {
+                          confirm({
+                            title: "Confirm",
+                            content: "Delete all rows selected?",
+                            onCancel: () => console.log("Cancel"),
+                            onOk: () => {
+                              handleSoftRemoveProduct(
+                                selectedRowKeys as string[]
+                              );
+                              setSelectedRowKeys([]);
+                            },
+                          });
+                        }}
+                      >
+                        Delete rows selected
+                      </Button>
+                    </Tooltip>
+                  </>
+                )}
+                {allowSelectRows &&
+                  selectedRowKeys.length > -1 &&
+                  selectedRowKeys.length < total && (
+                    <Button
+                      style={{
+                        height: "auto",
+                      }}
+                      className="p-0"
+                      type="link"
+                      onClick={handleSelectAll}
+                    >
+                      Select all
+                    </Button>
+                  )}
+              </Space>
+            </div>
+          </div>
+          <div className="col text-right">
+            <Space className="mt-2">
+              <Input.Search
+                allowClear={true}
+                onClear={() => {
+                  getProducts();
+                  setSearchKey("");
+                }}
+                placeholder="Search"
+                onSearch={(key: string) => {
+                  handleSearchProduct(key);
+                }}
+                className=""
+              />
+              <Button className="btn-primary">Add product</Button>
+              <Button className="btn-text">
+                Filter <Sort />
               </Button>
-            )}
-          </Space>
+            </Space>
+          </div>
         </div>
         <div className="row">
           <Table
+            loading={isLoading}
             pagination={{
+              current: paginationPage,
               showQuickJumper: false,
               showSizeChanger: true,
               onShowSizeChange: (_current, size) => {
+                setIsLoading(true);
                 setPaginationSize(size);
+                
               },
               total: total,
               onChange: (page, _pageSize) => {
+                setIsLoading(true);
                 setPaginationPage(page);
+                
               },
             }}
-            
-            rowSelection={allowSelectRows? rowSelection : undefined}
+            rowSelection={allowSelectRows ? rowSelection : undefined}
             bordered
             dataSource={products}
             columns={columns}
-            loading={isLoading}
             scroll={{
               y: "calc(100vh - 245px)",
             }}
