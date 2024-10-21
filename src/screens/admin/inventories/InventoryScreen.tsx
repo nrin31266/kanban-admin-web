@@ -41,7 +41,8 @@ const InventoryScreen = () => {
   const [productSelected, setProductSelected] = useState<ProductModel>();
 
   const [paginationPage, setPaginationPage] = useState<number>(1);
-  const [paginationSize, setPaginationSize] = useState<number>(10); 
+  const [paginationSize, setPaginationSize] = useState<number>(10);
+  const [allowSelectRows, setAllowSelectRows] = useState<boolean>(false);
 
   const [total, setTotal] = useState<number>(0);
 
@@ -64,7 +65,7 @@ const InventoryScreen = () => {
     let api = `${API.PRODUCTS}/data?page=${paginationPage}&size=${paginationSize}`;
     try {
       const res = await handleAPI(api);
-      const paginationRes : PaginationResponseModel = res.data.result;
+      const paginationRes: PaginationResponseModel = res.data.result;
       setTotal(paginationRes.totalElements);
       setProducts(
         paginationRes.data.map((item: ProductModel) => ({
@@ -79,18 +80,15 @@ const InventoryScreen = () => {
     }
   };
 
-  const handleRemoveProduct = async (productId: string) => {
+  const handleSoftRemoveProduct = async (productIds: string[]) => {
     setIsLoading(true);
     try {
       const res = await handleAPI(
-        `${API.PRODUCTS}/${productId}`,
-        undefined,
-        "delete"
+        `${API.PRODUCTS}/soft-delete`,
+        { ids: productIds },
+        "put"
       );
-      console.log(res);
-      res.data.result
-        ? message.success(res.data.message)
-        : message.error(res.data.message);
+      message.success(res.data.message);
       getProducts();
     } catch (error) {
       console.log(error);
@@ -98,9 +96,27 @@ const InventoryScreen = () => {
       setIsLoading(false);
     }
   };
+  
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(newSelectedRowKeys);
+  };
+
+  const handleSelectAll = async () => {
+    setAllowSelectRows(true);
+    let api = `${API.PRODUCTS}/data`;
+    try {
+      const res = await handleAPI(api);
+      const paginationRes: PaginationResponseModel = res.data.result;
+      if (paginationRes.data.length > 0) {
+        const listKeys: string[] = paginationRes.data.map(
+          (item: ProductModel) => item.id
+        );
+        setSelectedRowKeys(listKeys);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const rowSelection: TableRowSelection<ProductModel> = {
@@ -115,7 +131,7 @@ const InventoryScreen = () => {
       width: 60,
       title: "#",
       render: (_, __, index) => {
-        return ((paginationPage-1) * paginationSize + (index + 1));
+        return (paginationPage - 1) * paginationSize + (index + 1);
       },
     },
     {
@@ -378,7 +394,7 @@ const InventoryScreen = () => {
                   title: "Confirm",
                   content:
                     "Are you sure to delete the product, any by-products will be lost!",
-                  onOk: () => handleRemoveProduct(product.id),
+                  onOk: () => handleSoftRemoveProduct([product.id]),
                   onCancel: () => console.log("Cancel"),
                 });
               }}
@@ -396,11 +412,48 @@ const InventoryScreen = () => {
     <>
       <div className="col">
         <div className="row">
-          {selectedRowKeys.length > -1 && (
-            <Typography.Text>
-              {selectedRowKeys.length} items selected
-            </Typography.Text>
-          )}
+          {
+
+          }
+          <Space>
+            {
+              <Button type="text"  onClick={()=>{
+                if(allowSelectRows) {
+                  setAllowSelectRows(false);
+                  setSelectedRowKeys([]);
+                } else setAllowSelectRows(true);
+              }}>
+                Allow select
+              </Button>
+            }
+            {selectedRowKeys.length > 0 && (
+              <>
+                <Typography.Text>
+                  {selectedRowKeys.length} items selected
+                </Typography.Text>
+                <Tooltip title="Delete products">
+                  <Button type="text" className="text-danger" onClick={()=>{
+                    confirm({
+                      title: "Confirm",
+                      content: "Delete all rows selected?",
+                      onCancel: () =>console.log("Cancel"),
+                      onOk: ()=> {
+                        handleSoftRemoveProduct(selectedRowKeys as string[])
+                        setSelectedRowKeys([]);
+                      }
+                    })
+                  }}>
+                    Delete rows selected
+                  </Button>
+                </Tooltip>
+              </>
+            )}
+            {selectedRowKeys.length > -1 && selectedRowKeys.length < total && (
+              <Button type="link" onClick={handleSelectAll}>
+                Select all
+              </Button>
+            )}
+          </Space>
         </div>
         <div className="row">
           <Table
@@ -411,11 +464,12 @@ const InventoryScreen = () => {
                 setPaginationSize(size);
               },
               total: total,
-              onChange: (page, _pageSize)=>{
+              onChange: (page, _pageSize) => {
                 setPaginationPage(page);
-              }
+              },
             }}
-            rowSelection={rowSelection}
+            
+            rowSelection={allowSelectRows? rowSelection : undefined}
             bordered
             dataSource={products}
             columns={columns}
