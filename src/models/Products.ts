@@ -45,3 +45,18 @@ export interface SubProductModel {
   createdAt: string
   updatedAt: string
 }
+
+export interface FilterProductValue{
+  color?: string|string[];
+  categories?: string[],
+  size?: string|string[],
+  price?:{
+    min: number,
+    max: number
+  }
+}
+
+export interface FilterValueResponse {
+  key: string
+  selectData: string[]
+}

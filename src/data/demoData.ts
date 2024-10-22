@@ -1,3 +1,84 @@
+
+export const demoData1 = [
+    {
+        "photoUrl": null,
+        "name": "Nguyen Van C",
+        "product": "Phone",
+        "categories": null,
+        "price": 424.435,
+        "contact": "0332275647",
+        "talking": true,
+        "onTheWay": 23,
+        "email": "nrin31266@gmail.com"
+    },
+    {
+        "photoUrl": null,
+        "name": "Nguyen Van C",
+        "product": "Phone",
+        "categories": null,
+        "price": 424.435,
+        "contact": "0332275647",
+        "talking": true,
+        "onTheWay": 23,
+        "email": "nrin31266@gmail.com"
+    },
+    {
+        "photoUrl": null,
+        "name": "Nguyen Van C",
+        "product": "Phone",
+        "categories": null,
+        "price": 424.435,
+        "contact": "0332275647",
+        "talking": true,
+        "onTheWay": 23,
+        "email": "nrin31266@gmail.com"
+    },
+    {
+        "photoUrl": null,
+        "name": "Nguyen Van C",
+        "product": "Phone",
+        "categories": null,
+        "price": 424.435,
+        "contact": "0332275647",
+        "talking": true,
+        "onTheWay": 23,
+        "email": "nrin31266@gmail.com"
+    },
+    {
+        "photoUrl": null,
+        "name": "Nguyen Van C",
+        "product": "Phone",
+        "categories": null,
+        "price": 424.435,
+        "contact": "0332275647",
+        "talking": true,
+        "onTheWay": 23,
+        "email": "nrin31266@gmail.com"
+    },
+    {
+        "photoUrl": null,
+        "name": "Nguyen Van C",
+        "product": "Phone",
+        "categories": null,
+        "price": 424.435,
+        "contact": "0332275647",
+        "talking": true,
+        "onTheWay": 23,
+        "email": "nrin31266@gmail.com"
+    },
+    {
+        "photoUrl": null,
+        "name": "Nguyen Van C",
+        "product": "Phone",
+        "categories": null,
+        "price": 424.435,
+        "contact": "0332275647",
+        "talking": true,
+        "onTheWay": 23,
+        "email": "nrin31266@gmail.com"
+    },
+]
+
 export const demoData = [
     {
         title: "iPhone 15 Pro",

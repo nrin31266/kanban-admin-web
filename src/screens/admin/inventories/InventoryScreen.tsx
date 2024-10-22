@@ -1,6 +1,8 @@
 import {
   Avatar,
   Button,
+  Card,
+  Dropdown,
   Image,
   Input,
   message,
@@ -15,6 +17,7 @@ import {
 import React, { useEffect, useState } from "react";
 import {
   CategoryModel,
+  FilterProductValue,
   ProductModel,
   SubProductModel,
 } from "../../../models/Products";
@@ -29,6 +32,9 @@ import { Edit2, Sort, Trash } from "iconsax-react";
 import { TiTick } from "react-icons/ti";
 import { PaginationResponseModel } from "../../../models/AppModel";
 import { replaceName } from "../../../utils/replaceName";
+import { RiDeleteBin5Fill } from "react-icons/ri";
+import { FaEdit } from "react-icons/fa";
+import { FilterProduct } from "../../../components";
 const { confirm } = Modal;
 
 type TableRowSelection<T extends object = object> =
@@ -42,70 +48,59 @@ const InventoryScreen = () => {
     useState<boolean>(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [productSelected, setProductSelected] = useState<ProductModel>();
-
   const [paginationPage, setPaginationPage] = useState<number>(1);
   const [paginationSize, setPaginationSize] = useState<number>(10);
   const [allowSelectRows, setAllowSelectRows] = useState<boolean>(false);
-
   const [total, setTotal] = useState<number>(0);
   const [searchKey, setSearchKey] = useState<string>("");
-
   const navigate = useNavigate();
 
   useEffect(() => {
-    getProducts();
+    getInitData();
   }, []);
-
   useEffect(() => {
-    let api;
-    if (searchKey.length >= 4) {
-      api = `${API.PRODUCTS}/data?title=${searchKey}&page=${paginationPage}&size=${paginationSize}`;
-    } else {
-      api = `${API.PRODUCTS}/data?page=${paginationPage}&size=${paginationSize}`;
-    }
-    console.log("useEffect triggered with api:", api);
-    getProducts(api);
-  }, [paginationPage, paginationSize, searchKey]);
-
-  const handleSearchProduct = (key: string) => {
-    
-    if (key.trim() === "") {
-      return;
-    }
-    if (key.length < 4) {
-      message.warning("Please enter at least 4 characters to search!");
-      return;
-    }
-
-    let keySearch:string = replaceName(key);
-    console.log("Key search:", keySearch);
-    if(keySearch===searchKey){return;}
-    setIsLoading(true);
     setPaginationPage(1);
-    setSearchKey(keySearch);
-    
+  }, [paginationSize]);
+  useEffect(() => {
+    if (searchKey.length >= 4) {
+      getProducts(
+        `${API.PRODUCTS}/data?title=${searchKey}&page=${paginationPage}&size=${paginationSize}`
+      );
+    } else {
+      getProducts();
+    }
+  }, [paginationPage, paginationSize, searchKey]);
+  useEffect(() => {
+    console.log(selectedRowKeys);
+  }, [selectedRowKeys]);
+  const getInitData = async () => {
+    setIsInitLoading(true);
+    try {
+      await getProducts();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsInitLoading(false);
+    }
   };
-
   const getProducts = async (api?: string) => {
-    setIsLoading(true);
-    console.log("getProducts called, api:", api);
     if (!api) {
       api = `${API.PRODUCTS}/data?page=${paginationPage}&size=${paginationSize}`;
     }
-    
-    console.log("isLoading set to true");
+    console.log("getProducts called, api:", api);
+    setIsLoading(true);
+    isLoading && console.log("isLoading set to true");
     try {
       const res = await handleAPI(api);
       const paginationRes: PaginationResponseModel = res.data.result;
 
-      setProducts(
-        paginationRes.data.map((item: ProductModel) => ({
-          ...item,
-          key: item.id,
-        }))
-      );
-      console.log(paginationRes.data);
+      console.log("Total elements:", paginationRes.totalElements);
+      console.log("Products length:", paginationRes.data.length);
+
       setTotal(paginationRes.totalElements);
+      setProducts(paginationRes.data);
+
+      console.log(paginationRes);
     } catch (error) {
       console.log(error);
     } finally {
@@ -113,11 +108,23 @@ const InventoryScreen = () => {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    console.log(selectedRowKeys);
-  }, [selectedRowKeys]);
-
+  const handleSearchProduct = (key: string) => {
+    if (key.trim() === "") {
+      return;
+    }
+    if (key.length < 4) {
+      message.warning("Please enter at least 4 characters to search!");
+      return;
+    }
+    let keySearch: string = replaceName(key);
+    console.log("Key search:", keySearch);
+    if (keySearch === searchKey) {
+      return;
+    }
+    setIsLoading(true);
+    setPaginationPage(1);
+    setSearchKey(keySearch);
+  };
   const handleSoftRemoveProduct = async (productIds: string[]) => {
     setIsLoading(true);
     try {
@@ -134,11 +141,9 @@ const InventoryScreen = () => {
       setIsLoading(false);
     }
   };
-
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
-
   const handleSelectAll = async () => {
     setAllowSelectRows(true);
     let api = `${API.PRODUCTS}/data`;
@@ -158,12 +163,14 @@ const InventoryScreen = () => {
       setIsLoading(false);
     }
   };
-
+  const handleUnSearch = () => {
+    setIsLoading(true);
+    setSearchKey("");
+  };
   const rowSelection: TableRowSelection<ProductModel> = {
     selectedRowKeys,
     onChange: onSelectChange,
   };
-
   const columns: ColumnProps<ProductModel>[] = [
     {
       key: "index",
@@ -421,7 +428,7 @@ const InventoryScreen = () => {
                 console.log(productSelected);
               }}
             >
-              <Edit2 className="text-primary" size={20} />
+              <FaEdit className="text-primary" size={20} />
             </Button>
           </Tooltip>
           <Tooltip title={"Delete product"} key={"btnDelete"}>
@@ -439,7 +446,7 @@ const InventoryScreen = () => {
                 });
               }}
             >
-              <Trash className="text-danger" size={20} />
+              <RiDeleteBin5Fill className="text-danger" size={20} />
             </Button>
           </Tooltip>
         </Space>
@@ -447,8 +454,9 @@ const InventoryScreen = () => {
       fixed: "right",
     },
   ];
-
-  return (
+  return isInitLoading ? (
+    <Spin size="large" />
+  ) : (
     <>
       <div className="col">
         <div className="row">
@@ -533,49 +541,57 @@ const InventoryScreen = () => {
               <Input.Search
                 allowClear={true}
                 onClear={() => {
-                  getProducts();
-                  setSearchKey("");
+                  handleUnSearch();
                 }}
                 placeholder="Search"
                 onSearch={(key: string) => {
                   handleSearchProduct(key);
                 }}
-                className=""
               />
-              <Button className="btn-primary">Add product</Button>
-              <Button className="btn-text">
-                Filter <Sort />
-              </Button>
+              <Button className="btn-primary">Add</Button>
+              <Dropdown trigger={['click']} dropdownRender={(menu) => <FilterProduct 
+              values={{
+
+              }} 
+              onFilter={(values: FilterProductValue)=>(console.log(values))}/>}>
+                <Button className="btn-text">
+                  Filter <Sort />
+                </Button>
+              </Dropdown>
             </Space>
           </div>
         </div>
         <div className="row">
           <Table
+            rowKey={"id"}
             loading={isLoading}
+            size="small"
             pagination={{
+              size: "small",
               current: paginationPage,
               showQuickJumper: false,
               showSizeChanger: true,
-              onShowSizeChange: (_current, size) => {
+              pageSizeOptions: [10, 50, 100],
+              onShowSizeChange: (_c, size) => {
                 setIsLoading(true);
                 setPaginationSize(size);
-                
               },
               total: total,
               onChange: (page, _pageSize) => {
                 setIsLoading(true);
                 setPaginationPage(page);
-                
               },
+              pageSize: paginationSize,
             }}
             rowSelection={allowSelectRows ? rowSelection : undefined}
             bordered
             dataSource={products}
             columns={columns}
-            scroll={{
-              y: "calc(100vh - 245px)",
-            }}
-          ></Table>
+            scroll={{ x: "max-content", y: "calc(100vh - 250px)" }}
+            // scroll={{
+            //   y: "calc(100vh - 245px)",
+            // }}
+          />
         </div>
       </div>
       <ModalAddSubProduct
