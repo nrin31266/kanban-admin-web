@@ -83,9 +83,19 @@ const FilterProduct = (props: Props) => {
       );
     });
   };
-  const handleOnFilter = (valuesSubmit: any) => {
-    console.log(filterValues);
-    console.log(valuesSubmit);
+  const handleOnFilter =async (valuesSubmit: any) => {
+    const api = `${API.PRODUCTS_FILTER_VALUES}`;
+    valuesSubmit.page= 1;
+    valuesSubmit.size= 10;
+    setIsLoading(true);
+    try {
+      console.log(valuesSubmit);
+      const res = await handleAPI(api, valuesSubmit, 'post');
+      console.log(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -110,7 +120,7 @@ const FilterProduct = (props: Props) => {
                   form={form}
                   disabled={isLoading}
                 >
-                  <Form.Item name="categories" label="Categories">
+                  <Form.Item name="categoryIds" label="Categories">
                     <Select
                       placeholder="Categories"
                       allowClear

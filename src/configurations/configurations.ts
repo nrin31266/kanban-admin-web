@@ -18,6 +18,7 @@ export const API = {
   PRODUCTS: "/kanban/products",
   SUB_PRODUCTS: "/kanban/sub-products",
   GET_PRODUCT_FILTER_VALUES: "/kanban/sub-products/filter-values",
+  PRODUCTS_FILTER_VALUES: "/kanban/products/filter",
 };
 
 export const appInfos = {
