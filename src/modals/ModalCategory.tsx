@@ -27,7 +27,7 @@ const ModalCategory = (props: Props) => {
         onClose={handleOnClose}
         onCancel={handleOnClose}
         footer={null}
-
+        
       >
         <AddCategory values={values} onAddNew={() => {
           onAddNew();

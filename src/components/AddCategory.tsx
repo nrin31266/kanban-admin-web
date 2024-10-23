@@ -1,4 +1,14 @@
-import { Button, Form, Input, message, Modal, Space, TreeSelect } from "antd";
+import {
+  Button,
+  Card,
+  Form,
+  Input,
+  message,
+  Modal,
+  Space,
+  TreeSelect,
+  Typography,
+} from "antd";
 import React, { useEffect, useState } from "react";
 import { API } from "../configurations/configurations";
 import handleAPI from "../apis/handleAPI";
@@ -57,7 +67,13 @@ const AddCategory = (props: Props) => {
   }, [selected]);
 
   return (
-    <>
+    <Card
+      title={
+        <Typography.Text style={{ fontSize: "20px" }}>
+          {selected ? "Update category" : "Add category"}
+        </Typography.Text>
+      }
+    >
       <Form
         disabled={isLoading}
         layout="vertical"
@@ -110,10 +126,14 @@ const AddCategory = (props: Props) => {
           <Input.TextArea rows={3} allowClear />
         </Form.Item>
       </Form>
+
       <Space>
+        <Button type="primary" disabled={isLoading} onClick={form.submit}>
+          {selected ? "Update" : "Submit"}
+        </Button>
         {onClose && (
           <Button
-            type="primary"
+            type="text"
             disabled={isLoading}
             onClick={() => {
               form.resetFields();
@@ -123,11 +143,8 @@ const AddCategory = (props: Props) => {
             Cancel
           </Button>
         )}
-        <Button type="primary" disabled={isLoading} onClick={form.submit}>
-          {selected ? "Update" : "Submit"}
-        </Button>
       </Space>
-    </>
+    </Card>
   );
 };
 

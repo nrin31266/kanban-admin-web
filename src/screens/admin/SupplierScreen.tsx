@@ -6,8 +6,8 @@ import { ToggleSupplier } from "../../modals";
 import { SupplierModel } from "../../models/SupplierModel";
 import { FormModel } from "./../../models/FormModel";
 import TableComponent from "../../components/TableComponent";
-import { FiUserX } from "react-icons/fi";
-import { FiEdit3 } from "react-icons/fi";
+import { RiDeleteBin5Fill } from "react-icons/ri";
+import { FaEdit } from "react-icons/fa";
 const { confirm } = Modal;
 
 const SupplierScreen = () => {
@@ -115,9 +115,9 @@ const SupplierScreen = () => {
                   setSuppliersSelected(item);
                   setIsVisibleToggleSupplies(true);
                 }}
-                className="text-info"
+                className="text-primary"
                 type="text"
-                icon={<FiEdit3 size={20} />}
+                icon={<FaEdit size={20} />}
               />
               <Button
                 onClick={() =>
@@ -131,7 +131,7 @@ const SupplierScreen = () => {
                 }
                 className="text-danger"
                 type="text"
-                icon={<FiUserX size={20} />}
+                icon={<RiDeleteBin5Fill size={20} />}
               />
             </Space>
           }/>

@@ -19,6 +19,7 @@ import {
   CategoryModel,
   FilterProductValue,
   ProductModel,
+  ProductResponse,
   SubProductModel,
 } from "../../../models/Products";
 import handleAPI from "../../../apis/handleAPI";
@@ -71,7 +72,6 @@ const InventoryScreen = () => {
     }
   }, [paginationPage, paginationSize, searchKey]);
   useEffect(() => {
-    console.log(selectedRowKeys);
   }, [selectedRowKeys]);
   const getInitData = async () => {
     setIsInitLoading(true);
@@ -87,24 +87,17 @@ const InventoryScreen = () => {
     if (!api) {
       api = `${API.PRODUCTS}/data?page=${paginationPage}&size=${paginationSize}`;
     }
-    console.log("getProducts called, api:", api);
     setIsLoading(true);
-    isLoading && console.log("isLoading set to true");
     try {
       const res = await handleAPI(api);
       const paginationRes: PaginationResponseModel = res.data.result;
 
-      console.log("Total elements:", paginationRes.totalElements);
-      console.log("Products length:", paginationRes.data.length);
-
       setTotal(paginationRes.totalElements);
       setProducts(paginationRes.data);
 
-      console.log(paginationRes);
     } catch (error) {
       console.log(error);
     } finally {
-      console.log("isLoading set to false");
       setIsLoading(false);
     }
   };
@@ -146,14 +139,14 @@ const InventoryScreen = () => {
   };
   const handleSelectAll = async () => {
     setAllowSelectRows(true);
-    let api = `${API.PRODUCTS}/data`;
+    let api = `${API.PRODUCTS}`;
     setIsLoading(true);
     try {
       const res = await handleAPI(api);
       const paginationRes: PaginationResponseModel = res.data.result;
       if (paginationRes.data.length > 0) {
         const listKeys: string[] = paginationRes.data.map(
-          (item: ProductModel) => item.id
+          (item: ProductResponse) => item.id
         );
         setSelectedRowKeys(listKeys);
       }
@@ -245,12 +238,12 @@ const InventoryScreen = () => {
           <div
             style={{
               display: "flex",
-              flexWrap: "wrap", // Cho phép hình ảnh tự động xuống hàng
-              gap: "4px", // Khoảng cách giữa các hình ảnh
+              flexWrap: "wrap", 
+              gap: "4px",
             }}
           >
             {categories.map((category: CategoryModel, _index) => (
-              <Link to={"/categories/detail/${item.slug}?id=${item.key}"}>
+              <Link to={`/categories/detail/${category.slug}?id=${category.id}`}>
                 <Tag
                   style={{
                     margin: "0",

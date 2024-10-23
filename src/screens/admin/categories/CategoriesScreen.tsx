@@ -2,14 +2,15 @@ import React, { useEffect, useState } from "react";
 
 import { Button, Card, message, Modal, Space, Table, Tooltip } from "antd";
 import { ColumnProps } from "antd/es/table";
-import { FaTrashAlt } from "react-icons/fa";
-import { FiEdit3 } from "react-icons/fi";
+
 import { Link } from "react-router-dom";
 import { CategoryTableData } from "../../../models/Products";
 import { TreeModel } from "../../../models/FormModel";
 import handleAPI from "../../../apis/handleAPI";
 import { API } from "../../../configurations/configurations";
 import { AddCategory } from "../../../components";
+import { RiDeleteBin5Fill } from "react-icons/ri";
+import { FaEdit } from "react-icons/fa";
 
 const { confirm } = Modal;
 
@@ -36,6 +37,18 @@ const CategoriesScreen = () => {
     await getCategoriesTree();
     setIsInitLoading(false);
   }
+  const getCategoriesTree = async () => {
+    setIsLoading(true);
+    try {
+      const treeValue = await handleAPI(API.GET_CATEGORIES_TREE);
+      setCategoryTree(treeValue.data.result);
+      
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const getCategories = async () => {
     setIsLoading(true);
@@ -50,18 +63,7 @@ const CategoriesScreen = () => {
     }
   };
 
-  const getCategoriesTree = async () => {
-    setIsLoading(true);
-    try {
-      const treeValue = await handleAPI(API.GET_CATEGORIES_TREE);
-      setCategoryTree(treeValue.data.result);
-      
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  
 
   const handleRemoveCategory = async (categoryId: string) => {
     try {
@@ -92,7 +94,7 @@ const CategoriesScreen = () => {
       key: "name",
       title: "Name",
       dataIndex: "",
-      render: (item: CategoryTableData)=> <Link style={{color: '#51507B'}} to={`/categories/detail/${item.slug}?id=${item.key}`}>{item.name}</Link>
+      render: (item: CategoryTableData)=> <Link to={`/categories/detail/${item.slug}?id=${item.key}`}>{item.name}</Link>
     },
     {
       key: "description",
@@ -109,7 +111,7 @@ const CategoriesScreen = () => {
           <Tooltip title="Edit categories" key={"btnEdit"}>
             <Button 
             onClick={() => setCategorySelected(item)}
-            icon={<FiEdit3 size={20} color="silver" />} type="text" />
+            icon={<FaEdit size={20}  />} type="text" className="text-primary" />
           </Tooltip>
           <Tooltip title="Delete categories" key={"btnDelete"}>
             <Button
@@ -120,7 +122,7 @@ const CategoriesScreen = () => {
                   onOk: async () => handleRemoveCategory(item.key),
                 })
               }
-              icon={<FaTrashAlt size={20} className="text-danger" />}
+              icon={<RiDeleteBin5Fill size={20} className="text-danger" />}
               type="text"
             />
           </Tooltip>
@@ -137,7 +139,7 @@ const CategoriesScreen = () => {
       <div className="container">
         <div className="row">
           <div className="col-md-4">
-            <Card title={'Add category'}>
+            <div>
               <AddCategory
               onClose={()=>setCategorySelected(undefined)}
               selected={categorySelected}
@@ -146,7 +148,7 @@ const CategoriesScreen = () => {
                 getCategories(); 
                 getCategoriesTree()}} 
               values={categoryTree}/>
-            </Card>
+            </div>
           </div>
           <div className="col-md-8">
             <Card>

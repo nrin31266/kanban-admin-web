@@ -8,7 +8,7 @@ const ReportScreen = () => {
   const handleFakeData = async () => {
     try {
       await Promise.all(
-        demoData.map((values) => handleAPI(API.PRODUCTS, values, "post"))
+        additionalDemoData.map((values) => handleAPI(API.PRODUCTS, values, "post"))
       );
       console.log('ok');
     } catch (error) {

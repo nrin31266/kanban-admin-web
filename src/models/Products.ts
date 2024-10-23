@@ -35,6 +35,33 @@ export interface ProductModel {
   subProductResponse?: SubProductModel[];
 }
 
+export interface ProductResponse {
+  id: string
+  title: string
+  description: string
+  slug: string
+  supplierId: string
+  content: string
+  expiredDate: string
+  images: string[]
+  categoryIds: string[]
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ProductRequest {
+  title: string
+  description: string
+  slug: string
+  supplierId: string
+  content: string
+  expiredDate: string
+  images: string[]
+  categoryIds: string[]
+}
+
+
+
 export interface SubProductModel {
   size: string
   color: any

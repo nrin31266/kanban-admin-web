@@ -25,7 +25,7 @@ import { replaceName } from "../../../utils/replaceName";
 import { uploadFile, uploadFiles } from "../../../utils/uploadFile";
 import { AddSquare } from "iconsax-react";
 import { ModalCategory } from "../../../modals";
-import { ProductModel } from "./../../../models/Products";
+import { ProductModel, ProductRequest, ProductResponse } from "./../../../models/Products";
 
 const { Title } = Typography;
 
@@ -33,14 +33,14 @@ const AddProduct = () => {
   const [isInitLoading, setIsInitLoading] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
   const [suppliersOption, setSuppliersOption] = useState<SelectModel[]>();
-  const editorRef = useRef<any>(null);
+  // const editorRef = useRef<any>(null);
   const [form] = Form.useForm();
-  const [fileURL, setFileURL] = useState<string>("");
+  // const [fileURL, setFileURL] = useState<string>("");
   const [isVisibleCategory, setIsVisibleCategory] = useState(false);
   const [categories, setCategories] = useState<TreeModel[]>([]);
   // const [files, setFiles] = useState<any[]>([]);
   // const inputFileRef = useRef<any>(null);
-  const [content, setContent] = useState<string>("");
+  // const [content, setContent] = useState<string>("");
   const [searchPrams] = useSearchParams();
   const [idProduct, setIdProduct] = useState<string | null>("");
   const navigate = useNavigate();
@@ -56,7 +56,6 @@ const AddProduct = () => {
 
   useEffect(() => {
     if (idProduct) {
-      console.log(idProduct);
       getProductDetail(idProduct);
     }
   }, [idProduct]);
@@ -75,23 +74,22 @@ const AddProduct = () => {
     );
     setFileList(items);
   };
-  console.log(fileList);
+
   const getProductDetail = async (idProduct: string) => {
     try {
       const res = await handleAPI(`${API.PRODUCTS}/${idProduct}`);
-      const item: ProductModel = res.data.result;
+      console.log(res.data);
+      const item: ProductResponse = res.data.result;
       if (item) {
-        const { categories, ...filterItem } = item;
-        const listIdCategories = categories.map((values, _index) => values.id);
-        form.setFieldsValue(filterItem);
-        form.setFieldValue("categories", listIdCategories);
-        setContent(item.content);
+        form.setFieldsValue(item);
+        // setContent(item.content);
+        console.log(item);
         if (item.images && item.images.length > 0) {
-          const imgs: any = []; // Khởi tạo mảng imgs
+          const imgs: any = []; 
           item.images.forEach((urlImg, index) => {
             imgs.push({
-              uid: index, // Có thể sử dụng index, nhưng đảm bảo rằng nó không bị trùng lặp
-              name: `image-${index}`, // Đặt tên khác nhau cho từng hình ảnh
+              uid: index, 
+              name: `image-${index}`, 
               status: "done",
               url: urlImg,
             });
@@ -104,10 +102,9 @@ const AddProduct = () => {
     }
   };
 
-  const handleAddNewProduct = async (values: ProductModel) => {
-    setIsLoading(true);
-    console.log(values.categories);
-    values.content = content;
+  const handleAddNewProduct = async (values: ProductRequest) => {
+    
+    // values.content = content;
     values.slug = replaceName(values.title);
     // if (files.length > 0) {
     //   const uploadPromises = Object.keys(files).map(async (i) => {
@@ -117,6 +114,7 @@ const AddProduct = () => {
     //   });
     //   values.images = await Promise.all(uploadPromises);
     // }
+    setIsLoading(true);
     if (fileList && fileList.length > 0) {
       const files: any[] = [];
       let imagesUrl: string[] = [];
@@ -137,6 +135,7 @@ const AddProduct = () => {
         return;
       }
     }
+    console.log(values);
     const api = idProduct ? `${API.PRODUCTS}/${idProduct}` : API.PRODUCTS;
     try {
       const res = await handleAPI(api, values, idProduct ? "put" : "post");
@@ -151,7 +150,8 @@ const AddProduct = () => {
         setIdProduct(null);
         navigate("/inventory");
       }
-      setContent("");
+      // setContent("");
+      setFileList([]);
     } catch (error: any) {
       console.log(error);
       message.error(error.message);
@@ -250,8 +250,7 @@ const AddProduct = () => {
             >
               <Input.TextArea rows={3} showCount maxLength={1000} />
             </Form.Item>
-
-            <Editor
+            {/* <Editor
               onInit={(_evt, editor) => (editorRef.current = editor)}
               apiKey="ih07bjaxxgp5ywku0piogyodrxm13wttrpxz59qydzru6vpj"
               init={{
@@ -284,7 +283,7 @@ const AddProduct = () => {
               onEditorChange={(newContent, _editor) => {
                 setContent(newContent); // Cập nhật trạng thái khi nội dung thay đổi
               }}
-            />
+            /> */}
           </div>
           <div className="col-md-4">
             <Card size="small" className="mt-4" title="Categories">
@@ -295,7 +294,7 @@ const AddProduct = () => {
                     message: "Required",
                   },
                 ]}
-                name={"categories"}
+                name={"categoryIds"}
               >
                 <TreeSelect
                   filterTreeNode={(input, treeNode) =>
@@ -303,6 +302,7 @@ const AddProduct = () => {
                       replaceName(input)
                     )
                   }
+                  placeholder={'Select categories!'}
                   multiple
                   allowClear
                   treeData={categories}
@@ -368,7 +368,8 @@ const AddProduct = () => {
                   disabled={isLoading}
                   onClick={() => {
                     form.resetFields();
-                    setContent("");
+                    // setContent("");
+                    setFileList([]);
                   }}
                 >
                   Cancel
@@ -382,7 +383,7 @@ const AddProduct = () => {
                 </Button>
               </Space>
             </Card>
-            <Card>
+            {/* <Card>
               <Input
                 allowClear
                 onClear={() => setFileURL("")}
@@ -399,7 +400,7 @@ const AddProduct = () => {
                   }
                 }}
               />
-            </Card>
+            </Card> */}
           </div>
         </div>
       </Form>
