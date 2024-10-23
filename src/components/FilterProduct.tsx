@@ -4,7 +4,7 @@ import {
   FilterProductValue,
   FilterValueResponse,
 } from "../models/Products";
-import { Button, Card, Empty, Form, Input, Select, Space, Spin } from "antd";
+import { Button, Card, Empty, Form, Input, Select, Space, Spin, Typography } from "antd";
 import { API } from "../configurations/configurations";
 import handleAPI from "../apis/handleAPI";
 import { PaginationResponseModel } from "../models/AppModel";
@@ -126,6 +126,12 @@ const FilterProduct = (props: Props) => {
                       options={filterValues.colors}
                       mode="multiple"
                       disabled={false}
+                      optionRender={(option)=>(
+                      <div className="d-flex">
+                      <div  style={{background: option.value, height: '20px', width: '20px',border: '1px solid black'}}>
+                      </div>
+                      <Typography.Text>{option.label}</Typography.Text>
+                      </div>)}
                     />
                   </Form.Item>
                   <Form.Item name="sizes" label="Sizes">
@@ -138,17 +144,63 @@ const FilterProduct = (props: Props) => {
                     />
                   </Form.Item>
                   <div className="row p-0">
-                    <div className="col-5" style={{paddingRight: '0px'}}>
-                      <Form.Item name="minPrice" label="Min price">
-                        <Input disabled={false} type="number" placeholder="MIN" />
+                    <div className="col-5" style={{ paddingRight: "0px" }}>
+                      <Form.Item
+                        name="minPrice"
+                        label="Min price"
+                        rules={[
+                          {
+                            validator:(_, value)=>{
+                              if (value == null || value === '') {
+                                return Promise.resolve();
+                              }
+                              if (isNaN(value) || Number(value) < 0) {
+                                return Promise.reject(new Error("Number must be greater than or equal to 0!"));
+                              }
+                              return Promise.resolve();
+                            },
+                          },
+                        ]}
+                      >
+                        <Input
+                          disabled={false}
+                          type="number"
+                          placeholder="MIN"
+                        />
                       </Form.Item>
                     </div>
-                    <div className="col-2 text-center" style={{marginTop: '30px'}}>
-                        <IoArrowForward  size={30}/>
+                    <div
+                      className="col-2 text-center"
+                      style={{ marginTop: "30px" }}
+                    >
+                      <IoArrowForward size={30} />
                     </div>
-                    <div className="col" style={{paddingLeft: '0px'}}>
-                      <Form.Item name="maxPrice" label="Max price">
-                        <Input disabled={false} type="number" placeholder="MAX" />
+                    <div className="col" style={{ paddingLeft: "0px" }}>
+                      <Form.Item
+                        name="maxPrice"
+                        label="Max price"
+                        rules={[
+                          {
+                            validator: (_, value) => {
+                              if (value == null || value === '') {
+                                return Promise.resolve();
+                              }
+                              if (isNaN(value) || Number(value) < 0) {
+                                return Promise.reject(new Error("Number must be greater than or equal to 0!"));
+                              }
+                              if (form.getFieldValue('minPrice') != null && value <= Number(form.getFieldValue('minPrice'))) {
+                                return Promise.reject(new Error("Max price must be greater than Min price!"));
+                              }
+                              return Promise.resolve();
+                            },
+                          },
+                        ]}
+                      >
+                        <Input
+                          disabled={false}
+                          type="number"
+                          placeholder="MAX"
+                        />
                       </Form.Item>
                     </div>
                   </div>
