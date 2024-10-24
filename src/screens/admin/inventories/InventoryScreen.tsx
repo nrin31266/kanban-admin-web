@@ -20,6 +20,7 @@ import {
   FilterProductValue,
   ProductModel,
   ProductResponse,
+  ProductsFilterValuesRequest,
   SubProductModel,
 } from "../../../models/Products";
 import handleAPI from "../../../apis/handleAPI";
@@ -54,6 +55,8 @@ const InventoryScreen = () => {
   const [allowSelectRows, setAllowSelectRows] = useState<boolean>(false);
   const [total, setTotal] = useState<number>(0);
   const [searchKey, setSearchKey] = useState<string>("");
+  const [isFilter, setIsFilter] = useState<boolean>(false);
+  const [productFilterValues, setProductFilterValues] = useState<ProductsFilterValuesRequest>();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -63,16 +66,17 @@ const InventoryScreen = () => {
     setPaginationPage(1);
   }, [paginationSize]);
   useEffect(() => {
-    if (searchKey.length >= 4) {
+    if(isFilter){
+      handleOnFilter();
+    }else if (searchKey.length >= 4) {
       getProducts(
         `${API.PRODUCTS}/data?title=${searchKey}&page=${paginationPage}&size=${paginationSize}`
       );
     } else {
       getProducts();
     }
-  }, [paginationPage, paginationSize, searchKey]);
-  useEffect(() => {
-  }, [selectedRowKeys]);
+  }, [paginationPage, paginationSize, searchKey, productFilterValues]);
+  useEffect(() => {}, [selectedRowKeys]);
   const getInitData = async () => {
     setIsInitLoading(true);
     try {
@@ -94,12 +98,28 @@ const InventoryScreen = () => {
 
       setTotal(paginationRes.totalElements);
       setProducts(paginationRes.data);
-
     } catch (error) {
       console.log(error);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleOnFilter = async () => {
+    let requestBody = {...productFilterValues};
+    requestBody.size= paginationSize;
+    requestBody.page= paginationPage;
+    const api = `${API.PRODUCTS_FILTER_VALUES}`;
+    setIsLoading(true);
+    try {
+      const res = await handleAPI(api, requestBody, "post");
+      const paginationRes: PaginationResponseModel = res.data.result;
+      setTotal(paginationRes.totalElements);
+      setProducts(paginationRes.data);
+    } catch (error) {
+      console.log(error);
+    }
+    setIsLoading(false);
   };
   const handleSearchProduct = (key: string) => {
     if (key.trim() === "") {
@@ -137,6 +157,7 @@ const InventoryScreen = () => {
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
+
   const handleSelectAll = async () => {
     setAllowSelectRows(true);
     let api = `${API.PRODUCTS}`;
@@ -206,8 +227,8 @@ const InventoryScreen = () => {
           <div
             style={{
               display: "flex",
-              flexWrap: "wrap", // Cho phép hình ảnh tự động xuống hàng
-              gap: "4px", // Khoảng cách giữa các hình ảnh
+              flexWrap: "wrap", 
+              gap: "4px", 
             }}
           >
             {images.map((img, index) => (
@@ -238,12 +259,14 @@ const InventoryScreen = () => {
           <div
             style={{
               display: "flex",
-              flexWrap: "wrap", 
+              flexWrap: "wrap",
               gap: "4px",
             }}
           >
             {categories.map((category: CategoryModel, _index) => (
-              <Link to={`/categories/detail/${category.slug}?id=${category.id}`}>
+              <Link
+                to={`/categories/detail/${category.slug}?id=${category.id}`}
+              >
                 <Tag
                   style={{
                     margin: "0",
@@ -405,6 +428,7 @@ const InventoryScreen = () => {
               onClick={() => {
                 setIsVisibleModalAddSubProduct(true);
                 setProductSelected(product);
+                setPaginationPage(1);
               }}
             >
               <MdLibraryAdd color={colors.primary500} size={20} />
@@ -455,9 +479,19 @@ const InventoryScreen = () => {
         <div className="row">
           <div className="col text-left">
             <div className="row">
-              <Typography.Title className="mb-0" level={4}>
+              <Typography.Title  level={4}>
                 Products
               </Typography.Title>
+              {
+                isFilter && 
+                <div className="ml-3 d-flex">
+                  <Typography.Title type="success" level={4}>Filtered</Typography.Title>
+                  <Button type="text" className="p-0" onClick={()=>{
+                    setIsFilter(false);
+                    setProductFilterValues(undefined);
+                  }}>Cancel</Button>
+                </div>
+              }
             </div>
             <div className="row">
               <Space>
@@ -542,11 +576,18 @@ const InventoryScreen = () => {
                 }}
               />
               <Button className="btn-primary">Add</Button>
-              <Dropdown trigger={['click']} dropdownRender={(menu) => <FilterProduct 
-              values={{
-
-              }} 
-              onFilter={(values: FilterProductValue)=>(console.log(values))}/>}>
+              <Dropdown
+                trigger={["click"]}
+                dropdownRender={(_menu) => (
+                  <FilterProduct
+                    onFilter={(filterValues: ProductsFilterValuesRequest) => {
+                      setPaginationPage(1);
+                      setProductFilterValues(filterValues);
+                      setIsFilter(true);
+                    }}
+                  />
+                )}
+              >
                 <Button className="btn-text">
                   Filter <Sort />
                 </Button>

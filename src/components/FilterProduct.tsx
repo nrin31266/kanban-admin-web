@@ -3,8 +3,21 @@ import {
   CategoryModel,
   FilterProductValue,
   FilterValueResponse,
+  ProductModel,
+  ProductResponse,
+  ProductsFilterValuesRequest,
 } from "../models/Products";
-import { Button, Card, Empty, Form, Input, Select, Space, Spin, Typography } from "antd";
+import {
+  Button,
+  Card,
+  Empty,
+  Form,
+  Input,
+  Select,
+  Space,
+  Spin,
+  Typography,
+} from "antd";
 import { API } from "../configurations/configurations";
 import handleAPI from "../apis/handleAPI";
 import { PaginationResponseModel } from "../models/AppModel";
@@ -12,14 +25,13 @@ import { SelectModel } from "../models/FormModel";
 import { IoArrowForward } from "react-icons/io5";
 
 interface Props {
-  values: FilterProductValue;
-  onFilter: (values: FilterProductValue) => void;
+  onFilter: (values: ProductsFilterValuesRequest) => void;
 }
 
 const FilterProduct = (props: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isInitLoading, setIsInitLoading] = useState(false);
-  const { onFilter, values } = props;
+  const { onFilter } = props;
   const [filterValues, setFilterValues] = useState<{
     categories: SelectModel[];
     colors: SelectModel[];
@@ -83,19 +95,8 @@ const FilterProduct = (props: Props) => {
       );
     });
   };
-  const handleOnFilter =async (valuesSubmit: any) => {
-    const api = `${API.PRODUCTS_FILTER_VALUES}`;
-    valuesSubmit.page= 1;
-    valuesSubmit.size= 10;
-    setIsLoading(true);
-    try {
-      console.log(valuesSubmit);
-      const res = await handleAPI(api, valuesSubmit, 'post');
-      console.log(res.data);
-    } catch (error) {
-      console.log(error);
-    }
-    setIsLoading(false);
+  const handleOnFilter = (valuesSubmit: ProductsFilterValuesRequest) => {
+    onFilter(valuesSubmit);
   };
 
   return (
@@ -136,12 +137,19 @@ const FilterProduct = (props: Props) => {
                       options={filterValues.colors}
                       mode="multiple"
                       disabled={false}
-                      optionRender={(option)=>(
-                      <div className="d-flex">
-                      <div  style={{background: option.value, height: '20px', width: '20px',border: '1px solid black'}}>
-                      </div>
-                      <Typography.Text>{option.label}</Typography.Text>
-                      </div>)}
+                      optionRender={(option) => (
+                        <div className="d-flex">
+                          <div
+                            style={{
+                              background: option.value,
+                              height: "20px",
+                              width: "20px",
+                              border: "1px solid black",
+                            }}
+                          ></div>
+                          <Typography.Text>{option.label}</Typography.Text>
+                        </div>
+                      )}
                     />
                   </Form.Item>
                   <Form.Item name="sizes" label="Sizes">
@@ -160,12 +168,16 @@ const FilterProduct = (props: Props) => {
                         label="Min price"
                         rules={[
                           {
-                            validator:(_, value)=>{
-                              if (value == null || value === '') {
+                            validator: (_, value) => {
+                              if (value == null || value === "") {
                                 return Promise.resolve();
                               }
                               if (isNaN(value) || Number(value) < 0) {
-                                return Promise.reject(new Error("Number must be greater than or equal to 0!"));
+                                return Promise.reject(
+                                  new Error(
+                                    "Number must be greater than or equal to 0!"
+                                  )
+                                );
                               }
                               return Promise.resolve();
                             },
@@ -192,14 +204,25 @@ const FilterProduct = (props: Props) => {
                         rules={[
                           {
                             validator: (_, value) => {
-                              if (value == null || value === '') {
+                              if (value == null || value === "") {
                                 return Promise.resolve();
                               }
                               if (isNaN(value) || Number(value) < 0) {
-                                return Promise.reject(new Error("Number must be greater than or equal to 0!"));
+                                return Promise.reject(
+                                  new Error(
+                                    "Number must be greater than or equal to 0!"
+                                  )
+                                );
                               }
-                              if (form.getFieldValue('minPrice') != null && value <= Number(form.getFieldValue('minPrice'))) {
-                                return Promise.reject(new Error("Max price must be greater than Min price!"));
+                              if (
+                                form.getFieldValue("minPrice") != null &&
+                                value <= Number(form.getFieldValue("minPrice"))
+                              ) {
+                                return Promise.reject(
+                                  new Error(
+                                    "Max price must be greater than Min price!"
+                                  )
+                                );
                               }
                               return Promise.resolve();
                             },

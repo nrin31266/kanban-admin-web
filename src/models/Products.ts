@@ -83,6 +83,18 @@ export interface FilterProductValue{
   }
 }
 
+export interface ProductsFilterValuesRequest{
+  colors?: string[],
+  categoryIds?: string[]
+  title?:string,
+  sizes?:string[]
+  maxPrice?: number,
+  minPrice?:number
+  page: number,
+  size: number
+
+}
+
 export interface FilterValueResponse {
   key: string
   selectData: string[]
