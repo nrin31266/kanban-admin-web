@@ -116,6 +116,7 @@ const InventoryScreen = () => {
       const paginationRes: PaginationResponseModel = res.data.result;
       setTotal(paginationRes.totalElements);
       setProducts(paginationRes.data);
+      console.log(paginationRes);
     } catch (error) {
       console.log(error);
     }
@@ -428,7 +429,6 @@ const InventoryScreen = () => {
               onClick={() => {
                 setIsVisibleModalAddSubProduct(true);
                 setProductSelected(product);
-                setPaginationPage(1);
               }}
             >
               <MdLibraryAdd color={colors.primary500} size={20} />

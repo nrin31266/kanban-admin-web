@@ -73,6 +73,26 @@ export interface SubProductModel {
   updatedAt: string
 }
 
+export interface SubProductResponse{
+  id: string
+  size: string
+  color: any
+  price: number
+  quantity: number
+  images: string[]
+  productId: string
+  createdAt: string
+  updatedAt: string
+}
+export interface SubProductRequest{
+  size: string
+  color: any
+  price: number
+  productId: string
+  quantity: number
+  images: string[]
+}
+
 export interface FilterProductValue{
   color?: string|string[];
   categories?: string[],
