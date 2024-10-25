@@ -1,15 +1,15 @@
 import { Button, message } from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import handleAPI from "../../apis/handleAPI";
-import { API, colors } from "../../configurations/configurations";
-import { removeAuth } from "../../redux/reducers/authReducer";
-import { demoData } from "../../data/demoData";
-import { replaceName } from "../../utils/replaceName";
+import handleAPI from "../apis/handleAPI";
+import { API, colors } from "../configurations/configurations";
+import { removeAuth } from "../redux/reducers/authReducer";
+import { demoData } from "../data/demoData";
+import { replaceName } from "../utils/replaceName";
 import { useNavigate } from "react-router-dom";
 import { Resizable } from "re-resizable";
-import { StatisticComponent } from "../../components";
-import { StatisticModel } from "../../models/StatisticModel";
+import { StatisticComponent } from "../components";
+import { StatisticModel } from "../models/StatisticModel";
 import { LiaCoinsSolid } from "react-icons/lia";
 
 

@@ -1,11 +1,11 @@
 import { Button, message, Modal, Space, Table, Typography } from "antd";
 import { useEffect, useState } from "react";
-import handleAPI from "../../apis/handleAPI";
-import { API } from "../../configurations/configurations";
-import { ToggleSupplier } from "../../modals";
-import { SupplierModel } from "../../models/SupplierModel";
-import { FormModel } from "./../../models/FormModel";
-import TableComponent from "../../components/TableComponent";
+import handleAPI from "../apis/handleAPI";
+import { API } from "../configurations/configurations";
+import { ToggleSupplier } from "../modals";
+import { SupplierModel } from "../models/SupplierModel";
+import { FormModel } from "./../models/FormModel";
+import TableComponent from "../components/TableComponent";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { FaEdit } from "react-icons/fa";
 const { confirm } = Modal;

@@ -2,12 +2,12 @@ import React from "react";
 import { Layout, Affix } from "antd";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HeaderComponent, SiderComponent } from "../components";
-import HomeScreen from "../screens/admin/HomeScreen";
-import InventoryScreen from "../screens/admin/inventories/InventoryScreen";
-import AddProduct from "../screens/admin/inventories/AddProduct";
-import { ManageStoreScreen, OrdersScreen, ProductDetail, ReportScreen, SupplierScreen } from "../screens/admin";
-import CategoriesScreen from "../screens/admin/categories/CategoriesScreen";
-import CategoryDetail from "../screens/admin/categories/CategoryDetail";
+import HomeScreen from "../screens/HomeScreen";
+import InventoryScreen from "../screens/inventories/InventoryScreen";
+import AddProduct from "../screens/inventories/AddProduct";
+import { ManageStoreScreen, OrdersScreen, ProductDetail, ReportScreen, SupplierScreen } from "../screens";
+import CategoriesScreen from "../screens/categories/CategoriesScreen";
+import CategoryDetail from "../screens/categories/CategoryDetail";
 
 
 const { Content } = Layout;

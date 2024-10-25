@@ -16,16 +16,16 @@ import {
   Upload,
   UploadProps,
 } from "antd";
-import handleAPI from "../../../apis/handleAPI";
-import { API, colors } from "../../../configurations/configurations";
-import { SelectModel, TreeModel } from "./../../../models/FormModel";
-import { SupplierModel } from "../../../models/SupplierModel";
+import handleAPI from "../../apis/handleAPI";
+import { API, colors } from "../../configurations/configurations";
+import { SelectModel, TreeModel } from "./../../models/FormModel";
+import { SupplierModel } from "../../models/SupplierModel";
 import { replace, useNavigate, useSearchParams } from "react-router-dom";
-import { replaceName } from "../../../utils/replaceName";
-import { uploadFile, uploadFiles } from "../../../utils/uploadFile";
+import { replaceName } from "../../utils/replaceName";
+import { uploadFile, uploadFiles } from "../../utils/uploadFile";
 import { AddSquare } from "iconsax-react";
-import { ModalCategory } from "../../../modals";
-import { ProductModel, ProductRequest, ProductResponse } from "./../../../models/Products";
+import { ModalCategory } from "../../modals";
+import { ProductModel, ProductRequest, ProductResponse } from "./../../models/Products";
 
 const { Title } = Typography;
 

@@ -22,21 +22,20 @@ import {
   ProductResponse,
   ProductsFilterValuesRequest,
   SubProductModel,
-} from "../../../models/Products";
-import handleAPI from "../../../apis/handleAPI";
-import { API, colors } from "../../../configurations/configurations";
+} from "../../models/Products";
+import handleAPI from "../../apis/handleAPI";
+import { API, colors } from "../../configurations/configurations";
 import { ColumnProps, TableProps } from "antd/es/table";
 import { Link, useNavigate } from "react-router-dom";
-import { listColors } from "../../../constants/listColors";
 import { MdLibraryAdd } from "react-icons/md";
-import { ModalAddSubProduct } from "../../../modals";
+import { ModalAddSubProduct } from "../../modals";
 import { Edit2, Sort, Trash } from "iconsax-react";
 import { TiTick } from "react-icons/ti";
-import { PaginationResponseModel } from "../../../models/AppModel";
-import { replaceName } from "../../../utils/replaceName";
+import { PaginationResponseModel } from "../../models/AppModel";
+import { replaceName } from "../../utils/replaceName";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { FaEdit } from "react-icons/fa";
-import { FilterProduct } from "../../../components";
+import { FilterProduct } from "../../components";
 const { confirm } = Modal;
 
 type TableRowSelection<T extends object = object> =

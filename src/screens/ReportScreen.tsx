@@ -1,8 +1,8 @@
 import { Button } from "antd";
 import React from "react";
-import { additionalDemoData, demoData, demoData1 } from "../../data/demoData";
-import handleAPI from "../../apis/handleAPI";
-import { API } from "../../configurations/configurations";
+import { additionalDemoData, demoData, demoData1 } from "../data/demoData";
+import handleAPI from "../apis/handleAPI";
+import { API } from "../configurations/configurations";
 
 const ReportScreen = () => {
   const handleFakeData = async () => {

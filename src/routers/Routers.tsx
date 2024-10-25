@@ -1,7 +1,7 @@
 /** @format */
 
 import { useDispatch, useSelector } from 'react-redux';
-import { addAuth, authSelector, refreshAccessToken, refreshInfo } from '../redux/reducers/authReducer';
+import { addAuth, authSelector, refreshAccessToken, refreshInfo, removeAuth } from '../redux/reducers/authReducer';
 import AuthRouter from './AuthRouter';
 import MainRouter from './MainRouter';
 import { useEffect, useState } from 'react';
@@ -11,7 +11,7 @@ import { AuthModel } from '../models/AuthenticationModel';
 import handleAPI from '../apis/handleAPI';
 import { API } from '../configurations/configurations';
 import { UserInfoModel } from '../models/UserModel';
-import MainUserRouter from './MainUserRouter';
+import { Login } from 'iconsax-react';
 
 const Routers = () => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -42,7 +42,7 @@ const Routers = () => {
 		}
 	};
 	
-	return isLoading ? <Spin /> : !auth.accessToken ? <AuthRouter /> : auth.userInfo.roles.some(item => item.name === Role.ADMIN)? <MainRouter /> : <MainUserRouter/>;
+	return isLoading ? <Spin /> : !auth.accessToken ? <AuthRouter /> : auth.userInfo.roles.some(item => item.name === Role.ADMIN)? <MainRouter /> : <AuthRouter/>;
 };
 
 export default Routers;

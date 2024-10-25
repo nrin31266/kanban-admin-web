@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { API } from "../../../configurations/configurations";
-import handleAPI from "../../../apis/handleAPI";
+import { API } from "../../configurations/configurations";
+import handleAPI from "../../apis/handleAPI";
 import {
   Button,
   Empty,
@@ -19,13 +19,13 @@ import {
   ProductResponse,
   SubProductRequest,
   SubProductResponse,
-} from "../../../models/Products";
+} from "../../models/Products";
 import { ColumnProps } from "antd/es/table";
 import { getDownloadURL } from "firebase/storage";
-import { FormatCurrency } from "../../../utils/formatNumber";
+import { FormatCurrency } from "../../utils/formatNumber";
 import { FaEdit } from "react-icons/fa";
 import { RiDeleteBin5Fill } from "react-icons/ri";
-import ModalAddSubProduct from "./../../../modals/ModalAddSubProduct";
+import ModalAddSubProduct from "./../../modals/ModalAddSubProduct";
 
 const ProductDetail = () => {
   const [isLoading, setIsLoading] = useState(false);

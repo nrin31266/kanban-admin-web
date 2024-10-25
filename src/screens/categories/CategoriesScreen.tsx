@@ -4,11 +4,11 @@ import { Button, Card, message, Modal, Space, Table, Tooltip } from "antd";
 import { ColumnProps } from "antd/es/table";
 
 import { Link } from "react-router-dom";
-import { CategoryTableData } from "../../../models/Products";
-import { TreeModel } from "../../../models/FormModel";
-import handleAPI from "../../../apis/handleAPI";
-import { API } from "../../../configurations/configurations";
-import { AddCategory } from "../../../components";
+import { CategoryTableData } from "../../models/Products";
+import { TreeModel } from "../../models/FormModel";
+import handleAPI from "../../apis/handleAPI";
+import { API } from "../../configurations/configurations";
+import { AddCategory } from "../../components";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { FaEdit } from "react-icons/fa";
 
