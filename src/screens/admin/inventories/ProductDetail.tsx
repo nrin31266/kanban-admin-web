@@ -103,22 +103,22 @@ const ProductDetail = () => {
     }
   };
 
-  const handleUpdateSubProduct = async (
-    subProductRequest: SubProductRequest,
-    subProductId: string
-  ) => {
-    const api = `${API.SUB_PRODUCTS}/${subProductId}`;
-    setIsLoading(true);
-    try {
-      const res = await handleAPI(api, subProductRequest, "put");
-      message.success("Update successfully!");
-      getSubProducts();
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // const handleUpdateSubProduct = async (
+  //   subProductRequest: SubProductRequest,
+  //   subProductId: string
+  // ) => {
+  //   const api = `${API.SUB_PRODUCTS}/${subProductId}`;
+  //   setIsLoading(true);
+  //   try {
+  //     const res = await handleAPI(api, subProductRequest, "put");
+  //     message.success("Update successfully!");
+  //     getSubProducts();
+  //   } catch (error) {
+  //     console.log(error);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   const columns: ColumnProps<SubProductResponse>[] = [
     {

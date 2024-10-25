@@ -12,7 +12,6 @@ import {
 import React, { useEffect, useState } from "react";
 import {
   ProductModel,
-  ProductResponse,
   SubProductModel,
   SubProductRequest,
   SubProductResponse,
@@ -61,7 +60,6 @@ const ModalAddSubProduct = (props: Props) => {
     form.resetFields();
     setFileList([]);
     onClose();
-    //
   };
 
   const handleSubmit = async (values: SubProductRequest) => {
