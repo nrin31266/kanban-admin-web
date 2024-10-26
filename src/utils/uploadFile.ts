@@ -21,7 +21,6 @@ const resizeFile = (file: any) =>
     );
   });
 
-// Upload một file
 export const uploadFile = async (file: any) => {
   try {
     const newFile: any = await resizeFile(file);
@@ -42,7 +41,7 @@ export const uploadFile = async (file: any) => {
   }
 };
 
-// Upload nhiều file
+
 export const uploadFiles = async (files: any[]) => {
   const uploadPromises = files.map(async (file: any) => {
     try {
