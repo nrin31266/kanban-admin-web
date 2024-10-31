@@ -8,6 +8,7 @@ import AddProduct from "../screens/inventories/AddProduct";
 import { ManageStoreScreen, OrdersScreen, ProductDetail, ReportScreen, SupplierScreen } from "../screens";
 import CategoriesScreen from "../screens/categories/CategoriesScreen";
 import CategoryDetail from "../screens/categories/CategoryDetail";
+import PromotionsScreen from "../screens/PromotionsScreen";
 
 
 const { Content } = Layout;
@@ -47,6 +48,7 @@ const MainRouter = () => {
                 path="/manage-store"
                 element={<ManageStoreScreen />}
               ></Route>
+               <Route path="/promotions" element={<PromotionsScreen />} />
             </Routes>
           </Content>
         </Layout>

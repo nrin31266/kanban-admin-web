@@ -1,5 +1,5 @@
 import { Layout, Menu, MenuProps, Typography } from "antd";
-import { ProfileCircle } from "iconsax-react";
+import { PercentageCircle, ProfileCircle } from "iconsax-react";
 import { LuHome } from "react-icons/lu";
 import { Link } from "react-router-dom";
 import { MdOutlineInventory2 } from "react-icons/md";
@@ -59,6 +59,11 @@ const SiderComponent = () => {
       key: "manage-store",
       label: <Link to={"/manage-store"}>Manage Store</Link>,
       icon: <CgList size={20} />,
+    },
+    {
+      key: "promotions",
+      label: <Link to={"/promotions"}>Promotions</Link>,
+      icon: <PercentageCircle size={20} />,
     },
   ];
 
