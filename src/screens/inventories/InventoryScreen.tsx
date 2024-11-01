@@ -574,7 +574,7 @@ const InventoryScreen = () => {
                   handleSearchProduct(key);
                 }}
               />
-              <Button className="btn-primary">Add</Button>
+              <Button type="primary">Add</Button>
               <Dropdown
                 trigger={["click"]}
                 dropdownRender={(_menu) => (

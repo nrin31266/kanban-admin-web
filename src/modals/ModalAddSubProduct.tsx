@@ -12,18 +12,19 @@ import {
 import React, { useEffect, useState } from "react";
 import {
   ProductModel,
+  ProductResponse,
   SubProductModel,
   SubProductRequest,
   SubProductResponse,
 } from "../models/Products";
 import { API } from "../configurations/configurations";
-import { uploadFiles } from "../utils/uploadFile";
+import { changeFileListToUpload, processFileList, uploadFiles } from "../utils/uploadFile";
 import handleAPI from "../apis/handleAPI";
 
 interface Props {
   visible: boolean;
   onClose: () => void;
-  product?: ProductModel;
+  product?: ProductModel | ProductResponse;
   subProduct?: SubProductResponse;
   onAddNew?: (values: SubProductModel) => void;
   onUpdated?: () => void;
@@ -68,24 +69,8 @@ const ModalAddSubProduct = (props: Props) => {
     else if (product) values.productId = product.id;
     values.color = color;
     if (fileList && fileList.length > 0) {
-      const files: any[] = [];
-      let imagesUrl: string[] = [];
-      fileList.forEach((file, _index) => {
-        if (file.originFileObj) files.push(file.originFileObj);
-        else imagesUrl.push(file.url);
-      });
-      if (files && files.length > 0) {
-        const uploadedFilesUrl: string[] | null = await uploadFiles(files);
-        if (uploadedFilesUrl && uploadedFilesUrl.length > 0) {
-          imagesUrl = [...imagesUrl, ...uploadedFilesUrl];
-        }
-      }
-      if (imagesUrl && imagesUrl.length > 0) {
-        values.images = imagesUrl;
-      } else {
-        setIsLoading(false);
-        return;
-      }
+      const imagesUrl = await processFileList(fileList);
+      if(imagesUrl.length > 0) values.images= imagesUrl;
     }
     let api;
     subProduct
@@ -103,20 +88,6 @@ const ModalAddSubProduct = (props: Props) => {
     } finally {
       setIsLoading(false);
     }
-  };
-  const handleChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
-    const items = newFileList.map((item) =>
-      item.originFileObj
-        ? {
-            ...item,
-            url: item.originFileObj
-              ? URL.createObjectURL(item.originFileObj)
-              : "",
-            status: "done",
-          }
-        : { ...item }
-    );
-    setFileList(items);
   };
 
   return (
@@ -160,6 +131,7 @@ const ModalAddSubProduct = (props: Props) => {
           <Input allowClear />
         </Form.Item>
         <div className="row">
+
           <div className="col">
             <Form.Item name={"quantity"} label="Quantity">
               <InputNumber style={{ width: "100%" }} />
@@ -170,6 +142,11 @@ const ModalAddSubProduct = (props: Props) => {
               <InputNumber style={{ width: "100%" }} />
             </Form.Item>
           </div>
+          <div className="col">
+            <Form.Item name={"discount"} label="Discount">
+              <InputNumber style={{ width: "100%" }} />
+            </Form.Item>
+          </div>
         </div>
       </Form>
       <Upload
@@ -177,7 +154,7 @@ const ModalAddSubProduct = (props: Props) => {
         fileList={fileList}
         accept="image/*"
         listType="picture-card"
-        onChange={handleChange}
+        onChange={(newFileList)=>setFileList(changeFileListToUpload(newFileList.fileList))}
       >
         Upload
       </Upload>

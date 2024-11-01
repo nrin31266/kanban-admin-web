@@ -1,12 +1,12 @@
-import { message } from "antd";
+import { message, UploadFile } from "antd";
 import { storage } from "../firebase/firebaseConfig";
 import { replaceNameFile } from "./replaceName";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import Resizer from "react-image-file-resizer";
 
-// Resize file
-const resizeFile = (file: any) =>
-  new Promise((resolve) => {
+// Resize a single file
+const resizeFile = (file: File) =>
+  new Promise<File>((resolve) => {
     Resizer.imageFileResizer(
       file,
       1080,
@@ -14,57 +14,65 @@ const resizeFile = (file: any) =>
       "JPEG",
       90,
       0,
-      (newFile) => {
-        resolve(newFile);
-      },
-      "file",
+      (resizedFile) => resolve(resizedFile as File),
+      "file"
     );
   });
 
-export const uploadFile = async (file: any) => {
+// Upload a single file and return its URL
+export const uploadFile = async (file: File): Promise<string> => {
   try {
-    const newFile: any = await resizeFile(file);
-    const newFileName = replaceNameFile(newFile.name);
-
-    const storageRef = ref(storage, `images/${newFileName}`);
-    const res = await uploadBytes(storageRef, newFile);
-
-    if (res) {
-      return getDownloadURL(storageRef);
-    } else {
-      message.error("Error during file upload!");
-      return "Error upload";
-    }
+    const resizedFile = await resizeFile(file);
+    const fileName = replaceNameFile(resizedFile.name);
+    const storageRef = ref(storage, `images/${fileName}`);
+    await uploadBytes(storageRef, resizedFile);
+    return await getDownloadURL(storageRef);
   } catch (error) {
     message.error("Error uploading file!");
-    return "Error upload";
+    throw error;
   }
 };
 
-
-export const uploadFiles = async (files: any[]) => {
-  const uploadPromises = files.map(async (file: any) => {
-    try {
-      const newFile: any = await resizeFile(file);
-      const newFileName = replaceNameFile(newFile.name);
-      const storageRef = ref(storage, `images/${newFileName}`);
-
-      const res = await uploadBytes(storageRef, newFile);
-      if (res) {
-        return getDownloadURL(storageRef);
-      } else {
-        throw new Error(`Failed to upload file: ${newFileName}`);
-      }
-    } catch (error) {
-      throw new Error(`Error resizing/uploading file: ${file.name}`);
-    }
-  });
-
+// Upload multiple files and return their URLs
+export const uploadFiles = async (files: File[]): Promise<string[]> => {
   try {
-    const imagesUrl: string[] = await Promise.all(uploadPromises);
-    return imagesUrl;
+    const uploadPromises = files.map(uploadFile);
+    const imagesUrl = await Promise.all(uploadPromises);
+    return imagesUrl.filter((url): url is string => url !== null);
   } catch (error) {
     message.error("Error uploading one or more files!");
-    return null;
+    throw error;
   }
 };
+
+export const processFileList = async (fileList: any[]): Promise<string[]> => {
+  const filesToUpload: any[] = [];
+  const existingUrls: string[] = [];
+
+  // Separate files that need to be uploaded and existing URLs
+  fileList.forEach((file) => {
+    if (file.originFileObj) filesToUpload.push(file.originFileObj);
+    else if (file.url) existingUrls.push(file.url);
+  });
+
+  // Upload new files and combine URLs
+  if (filesToUpload.length > 0) {
+    const uploadedUrls = await uploadFiles(filesToUpload);
+    if(uploadedUrls) return [...existingUrls, ...uploadedUrls];
+  }
+  return existingUrls;
+};
+
+export const changeFileListToUpload = (newFileList: UploadFile[]): UploadFile[] => {
+  const items: UploadFile[] = newFileList.map((item) =>
+    item.originFileObj
+      ? {
+          ...item,
+          url: URL.createObjectURL(item.originFileObj),
+          status: "done",
+        }
+      : { ...item } 
+  );
+  return items; 
+};
+

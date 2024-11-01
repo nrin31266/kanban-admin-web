@@ -77,6 +77,7 @@ export interface SubProductResponse{
   id: string
   size: string
   color: any
+  discount: number
   price: number
   quantity: number
   images: string[]
@@ -86,6 +87,7 @@ export interface SubProductResponse{
 }
 export interface SubProductRequest{
   size: string
+  discount: number
   color: any
   price: number
   productId: string

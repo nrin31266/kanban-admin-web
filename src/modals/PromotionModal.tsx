@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import { DatePicker, Form, Input, InputNumber, Modal, Select, Upload, UploadFile } from "antd";
+import { URL } from "url";
+import { UploadChangeParam } from "antd/es/upload";
+import { url } from "inspector";
 
 interface Props {
   visible: boolean;
   onClose: () => void;
   promotion?: any;
 }
-const AddPromotionModal = (props: Props) => {
+const PromotionModal = (props: Props) => {
   const { onClose, visible, promotion } = props;
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([])
@@ -14,6 +17,10 @@ const AddPromotionModal = (props: Props) => {
     onClose();
   };
   const handleAddNewPromotion = async (values: any) => {console.log(values);};
+  // const handleChangeFile = (val :  UploadChangeParam<UploadFile<any>>)=>{
+  //   const file: UploadFile = val.fileList[0];
+  //   setFileList(file.originFileObj {...file, url: file.originFileObj} : {...file})
+  // }
 
   return (
     <Modal
@@ -29,7 +36,7 @@ const AddPromotionModal = (props: Props) => {
         <Upload
            listType="picture-card"
            fileList={fileList}
-           onChange={(value: any)=> console.log(value)}
+           onChange={(value)=> console.log(value)}
         >
           {fileList.length === 0? 'Upload' : null}
         </Upload>
@@ -126,4 +133,4 @@ const AddPromotionModal = (props: Props) => {
   );
 };
 
-export default AddPromotionModal;
+export default PromotionModal;

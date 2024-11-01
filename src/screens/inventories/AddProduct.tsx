@@ -16,13 +16,14 @@ import {
   Upload,
   UploadProps,
 } from "antd";
+
 import handleAPI from "../../apis/handleAPI";
 import { API, colors } from "../../configurations/configurations";
 import { SelectModel, TreeModel } from "./../../models/FormModel";
 import { SupplierModel } from "../../models/SupplierModel";
 import { replace, useNavigate, useSearchParams } from "react-router-dom";
 import { replaceName } from "../../utils/replaceName";
-import { uploadFile, uploadFiles } from "../../utils/uploadFile";
+import { changeFileListToUpload, processFileList, uploadFile, uploadFiles } from "../../utils/uploadFile";
 import { AddSquare } from "iconsax-react";
 import { ModalCategory } from "../../modals";
 import { ProductModel, ProductRequest, ProductResponse } from "./../../models/Products";
@@ -60,20 +61,6 @@ const AddProduct = () => {
     }
   }, [idProduct]);
 
-  const handleChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
-    const items = newFileList.map((item) =>
-      item.originFileObj
-        ? {
-            ...item,
-            url: item.originFileObj
-              ? URL.createObjectURL(item.originFileObj)
-              : "",
-            status: "done",
-          }
-        : { ...item }
-    );
-    setFileList(items);
-  };
 
   const getProductDetail = async (idProduct: string) => {
     try {
@@ -106,34 +93,10 @@ const AddProduct = () => {
     
     // values.content = content;
     values.slug = replaceName(values.title);
-    // if (files.length > 0) {
-    //   const uploadPromises = Object.keys(files).map(async (i) => {
-    //     const index = parseInt(i);
-    //     const url = await uploadFile(files[index]);
-    //     return url;
-    //   });
-    //   values.images = await Promise.all(uploadPromises);
-    // }
     setIsLoading(true);
     if (fileList && fileList.length > 0) {
-      const files: any[] = [];
-      let imagesUrl: string[] = [];
-      fileList.forEach((file, _index) => {
-        if (file.originFileObj) files.push(file.originFileObj);
-        else imagesUrl.push(file.url);
-      });
-      if (files && files.length > 0) {
-        const uploadedFilesUrl:string[] | null = await uploadFiles(files);
-        if(uploadedFilesUrl&& uploadedFilesUrl.length>0){
-          imagesUrl = [...imagesUrl, ...uploadedFilesUrl]; 
-        }
-      }
-      if (imagesUrl && imagesUrl.length > 0) {
-        values.images = imagesUrl;
-      } else {
-        setIsLoading(false);
-        return;
-      }
+      const imageUrls = await processFileList(fileList);
+      if(imageUrls.length > 0) values.images = imageUrls;
     }
     console.log(values);
     const api = idProduct ? `${API.PRODUCTS}/${idProduct}` : API.PRODUCTS;
@@ -329,7 +292,7 @@ const AddProduct = () => {
                 fileList={fileList}
                 accept="image/*"
                 listType="picture-card"
-                onChange={handleChange}
+                onChange={(newFileList)=>setFileList(changeFileListToUpload(newFileList.fileList))}
               >
                 Upload
               </Upload>

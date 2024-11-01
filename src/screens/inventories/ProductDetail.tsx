@@ -156,6 +156,19 @@ const ProductDetail = () => {
       },
     },
     {
+      key: "discount",
+      dataIndex: "discount",
+      title: "Discount",
+      render: (discount: number) => {
+        if(discount){
+          return FormatCurrency.VND.format(discount);
+        }else{
+          return 'N/A';
+        }
+        
+      },
+    },
+    {
       key: "quantity",
       dataIndex: "quantity",
       title: "Quantity",
@@ -249,8 +262,31 @@ const ProductDetail = () => {
         className="container-fluid"
         style={{ backgroundColor: "", width: "96%", height: "96%" }}
       >
-        <Typography.Title className="mb-0">Product: {product.title}</Typography.Title>
-        <Typography.Title level={4} className="mt-0" type="secondary">Sub product</Typography.Title>
+        <Typography.Title className="mb-0">
+          Product: {product.title}
+        </Typography.Title>
+        <div className="row">
+          <div className="col">
+            <Typography.Title level={4} className="mt-0" type="secondary">
+              Sub product
+            </Typography.Title>
+          </div>
+          <div className="col text-right">
+            <Tooltip title={"Add sub product"} key={"addSubProduct"}>
+              <Button
+                className=""
+                size="small"
+                type="primary"
+                onClick={() => {
+                  setIsVisibleModalAddSubProduct(true);
+                }}
+              >
+                Add sub product
+              </Button>
+            </Tooltip>
+          </div>
+        </div>
+
         <Table
           bordered
           loading={isLoading}
@@ -259,17 +295,17 @@ const ProductDetail = () => {
         />
       </div>
       <ModalAddSubProduct
+      product={product}
         onClose={() => {
           setIsVisibleModalAddSubProduct(false);
           setSubProductSelected(undefined);
         }}
         visible={isVisibleModalAddSubProduct}
         subProduct={subProductSelected}
-        onUpdated={()=>{
+        onUpdated={() => {
           setSubProductSelected(undefined);
           getSubProducts();
         }}
-        
       />
     </>
   ) : (

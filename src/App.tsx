@@ -19,8 +19,13 @@ function App() {
 		<>
 			<ConfigProvider
 				theme={{
-					token: {},
-					components: {},
+					token: {
+						colorPrimary: '#131118'
+					},
+					components: {
+						
+					},
+					
 				}}>
 				<Provider store={store}>
 					<Routers />
