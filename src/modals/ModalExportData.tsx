@@ -3,10 +3,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { FormModel } from "../models/FormModel";
 import handleAPI from "../apis/handleAPI";
 import Checkbox from "antd/es/checkbox/Checkbox";
-import { DateTime } from "../utils/dateTime";
-import { Link } from "react-router-dom";
-import { colors } from './../configurations/configurations';
 import { handleExportToExcel } from "../utils/handleExportToExcel";
+
 
 interface Props {
   visible: boolean;
@@ -149,8 +147,8 @@ const ModalExportData = (props: Props) => {
                 onChange={(val: any) =>
                   val
                     ? setDatesExport({
-                        start: `${DateTime.calendarDate(val[0])}T00:00:00Z`,
-                        end: `${DateTime.calendarDate(val[1])}T00:00:00Z`,
+                        start: val[0],
+                        end: val[1],
                       })
                     : setDatesExport({ start: "", end: "" })
                 }

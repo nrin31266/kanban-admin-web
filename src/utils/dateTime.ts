@@ -1,10 +1,11 @@
-export class DateTime{
+import { message } from "antd";
 
-    public static calendarDate = (val: any)=>{
-        const date = new Date(val);
-        return `${date.getFullYear()}-${this.add0ToNumber(date.getMonth()+1)}-${this.add0ToNumber(date.getDate())}`;
-    };
-    private static add0ToNumber = (number: number)=>{
-        return (number<10) ? `0${number}` : number
+export const isValidTimeRange = (start: Date, end: Date): boolean =>{
+    console.log(start.getTime());
+    console.log(end.getTime());
+    if(start.getTime() >= end.getTime()){
+        message.error('Time range invalid');
+        return false;
     }
+    return true;
 }

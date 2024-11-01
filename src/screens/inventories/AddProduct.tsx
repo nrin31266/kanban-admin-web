@@ -23,10 +23,19 @@ import { SelectModel, TreeModel } from "./../../models/FormModel";
 import { SupplierModel } from "../../models/SupplierModel";
 import { replace, useNavigate, useSearchParams } from "react-router-dom";
 import { replaceName } from "../../utils/replaceName";
-import { changeFileListToUpload, processFileList, uploadFile, uploadFiles } from "../../utils/uploadFile";
+import {
+  changeFileListToUpload,
+  processFileList,
+  uploadFile,
+  uploadFiles,
+} from "../../utils/uploadFile";
 import { AddSquare } from "iconsax-react";
 import { ModalCategory } from "../../modals";
-import { ProductModel, ProductRequest, ProductResponse } from "./../../models/Products";
+import {
+  ProductModel,
+  ProductRequest,
+  ProductResponse,
+} from "./../../models/Products";
 
 const { Title } = Typography;
 
@@ -44,6 +53,7 @@ const AddProduct = () => {
   // const [content, setContent] = useState<string>("");
   const [searchPrams] = useSearchParams();
   const [idProduct, setIdProduct] = useState<string | null>("");
+  const [product, setProduct] = useState<ProductResponse>();
   const navigate = useNavigate();
   const [fileList, setFileList] = useState<any[]>([]);
 
@@ -61,42 +71,44 @@ const AddProduct = () => {
     }
   }, [idProduct]);
 
+  useEffect(() => {
+    if (product) {
+      console.log(product);
+      // setContent(item.content);
+      form.setFieldsValue(product);
+      if (product.images && product.images.length > 0) {
+        const imgs: any = [];
+        product.images.forEach((urlImg, index) => {
+          imgs.push({
+            uid: index,
+            name: `image-${index}`,
+            status: "done",
+            url: urlImg,
+          });
+        });
+        setFileList((prev) => [...prev, ...imgs]);
+      }
+    }
+  }, [product]);
 
   const getProductDetail = async (idProduct: string) => {
     try {
       const res = await handleAPI(`${API.PRODUCTS}/${idProduct}`);
       console.log(res.data);
       const item: ProductResponse = res.data.result;
-      if (item) {
-        form.setFieldsValue(item);
-        // setContent(item.content);
-        console.log(item);
-        if (item.images && item.images.length > 0) {
-          const imgs: any = []; 
-          item.images.forEach((urlImg, index) => {
-            imgs.push({
-              uid: index, 
-              name: `image-${index}`, 
-              status: "done",
-              url: urlImg,
-            });
-          });
-          setFileList((prev) => [...prev, ...imgs]);
-        }
-      }
+      setProduct(item);
     } catch (error) {
       console.log(error);
     }
   };
 
   const handleAddNewProduct = async (values: ProductRequest) => {
-    
     // values.content = content;
     values.slug = replaceName(values.title);
     setIsLoading(true);
     if (fileList && fileList.length > 0) {
       const imageUrls = await processFileList(fileList);
-      if(imageUrls.length > 0) values.images = imageUrls;
+      if (imageUrls.length > 0) values.images = imageUrls;
     }
     console.log(values);
     const api = idProduct ? `${API.PRODUCTS}/${idProduct}` : API.PRODUCTS;
@@ -265,7 +277,7 @@ const AddProduct = () => {
                       replaceName(input)
                     )
                   }
-                  placeholder={'Select categories!'}
+                  placeholder={"Select categories!"}
                   multiple
                   allowClear
                   treeData={categories}
@@ -292,7 +304,9 @@ const AddProduct = () => {
                 fileList={fileList}
                 accept="image/*"
                 listType="picture-card"
-                onChange={(newFileList)=>setFileList(changeFileListToUpload(newFileList.fileList))}
+                onChange={(newFileList) =>
+                  setFileList(changeFileListToUpload(newFileList.fileList))
+                }
               >
                 Upload
               </Upload>

@@ -58,12 +58,14 @@ export const processFileList = async (fileList: any[]): Promise<string[]> => {
   // Upload new files and combine URLs
   if (filesToUpload.length > 0) {
     const uploadedUrls = await uploadFiles(filesToUpload);
-    if(uploadedUrls) return [...existingUrls, ...uploadedUrls];
+    if (uploadedUrls) return [...existingUrls, ...uploadedUrls];
   }
   return existingUrls;
 };
 
-export const changeFileListToUpload = (newFileList: UploadFile[]): UploadFile[] => {
+export const changeFileListToUpload = (
+  newFileList: UploadFile[]
+): UploadFile[] => {
   const items: UploadFile[] = newFileList.map((item) =>
     item.originFileObj
       ? {
@@ -71,8 +73,8 @@ export const changeFileListToUpload = (newFileList: UploadFile[]): UploadFile[] 
           url: URL.createObjectURL(item.originFileObj),
           status: "done",
         }
-      : { ...item } 
+      : { ...item }
   );
-  return items; 
+  return items;
 };
 
