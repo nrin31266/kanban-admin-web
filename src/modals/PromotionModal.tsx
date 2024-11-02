@@ -16,7 +16,8 @@ import handleAPI from "../apis/handleAPI";
 import { API } from "../configurations/configurations";
 import { isValidTimeRange } from "../utils/dateTime";
 import { PromotionRequest } from "../models/PromotionModel";
-import { changeFileListToUpload } from "../utils/uploadFile";
+import { changeFileListToUpload, processFileList } from "../utils/uploadFile";
+import { ColumnProps } from "antd/es/table";
 
 interface Props {
   visible: boolean;
@@ -27,16 +28,23 @@ const PromotionModal = (props: Props) => {
   const { onClose, visible, promotion } = props;
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [ isLoading, setIsLoading ] = useState(false);
   const handleClose = () => {
     onClose();
   };
   const handleAddNewPromotion = async (values: PromotionRequest) => {
-    console.log(values);
+    setIsLoading(true);
     if (!isValidTimeRange(new Date(values.start), new Date(values.end))) return;
+    const imageUrl: string = (await processFileList(fileList))[0];
+    values.imageUrl= imageUrl;
+    console.log(values);
     try {
-      // const res = await handleAPI(API.PROMOTIONS, values, 'post');
+      const res = await handleAPI(API.PROMOTIONS, values, 'post');
+      console.log(res.data);
     } catch (error) {
       console.log(error);
+    }finally{
+      setIsLoading(false);
     }
   };
   const handleChangeFile = (val: UploadChangeParam<UploadFile<any>>) => {
@@ -44,11 +52,18 @@ const PromotionModal = (props: Props) => {
     setFileList(changeFileListToUpload(files));
   };
 
+  const columns: ColumnProps[] = [{
+
+  }];
+
   return (
     <Modal
       title={"Add promotion"}
       onClose={handleClose}
       onCancel={handleClose}
+      okButtonProps={{
+        loading: isLoading,
+      }}
       open={visible}
       onOk={() => {
         form.submit();
@@ -85,11 +100,13 @@ const PromotionModal = (props: Props) => {
               name={"discountType"}
               label={"Discount type"}
               rules={[{ required: true }]}
-              initialValue={"1"}
+              initialValue={false}
             >
               <Select
+              allowClear
                 options={[
                   {
+
                     label: "PERCENTAGE",
                     value: false,
                   },
