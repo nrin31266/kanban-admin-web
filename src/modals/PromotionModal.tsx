@@ -15,7 +15,7 @@ import { url } from "inspector";
 import handleAPI from "../apis/handleAPI";
 import { API } from "../configurations/configurations";
 import { isValidTimeRange } from "../utils/dateTime";
-import { PromotionRequest } from "../models/PromotionModel";
+import { PromotionRequest, PromotionResponse } from "../models/PromotionModel";
 import { changeFileListToUpload, processFileList } from "../utils/uploadFile";
 import { ColumnProps } from "antd/es/table";
 
@@ -52,9 +52,7 @@ const PromotionModal = (props: Props) => {
     setFileList(changeFileListToUpload(files));
   };
 
-  const columns: ColumnProps[] = [{
-
-  }];
+  
 
   return (
     <Modal
@@ -108,11 +106,11 @@ const PromotionModal = (props: Props) => {
                   {
 
                     label: "PERCENTAGE",
-                    value: false,
+                    value: "PERCENTAGE",
                   },
                   {
                     label: "FIXED_AMOUNT",
-                    value: true,
+                    value: "FIXED_AMOUNT",
                   },
                 ]}
               />
