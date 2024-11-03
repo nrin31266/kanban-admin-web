@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   DatePicker,
   Form,
   Input,
   InputNumber,
+  message,
   Modal,
   Select,
   Upload,
@@ -18,29 +19,57 @@ import { isValidTimeRange } from "../utils/dateTime";
 import { PromotionRequest, PromotionResponse } from "../models/PromotionModel";
 import { changeFileListToUpload, processFileList } from "../utils/uploadFile";
 import { ColumnProps } from "antd/es/table";
-
+import { ApiResponse } from "../models/AppModel";
+import dayjs from 'dayjs';
 interface Props {
   visible: boolean;
   onClose: () => void;
-  promotion?: any;
+  promotion?: PromotionResponse;
+  onFinish: (values: PromotionResponse)=> void
 }
 const PromotionModal = (props: Props) => {
-  const { onClose, visible, promotion } = props;
+  const { onClose, visible, promotion, onFinish } = props;
   const [form] = Form.useForm();
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [fileList, setFileList] = useState<any[]>([]);
   const [ isLoading, setIsLoading ] = useState(false);
+  
+  
+
+  useEffect(()=>{
+    if(promotion){
+      form.setFieldsValue({...promotion, start: dayjs(promotion.start), end: dayjs(promotion.end)});
+      if(promotion.imageUrl){
+        const item ={
+          url: promotion.imageUrl,
+          status: 'done',
+          uid: 'blabala',
+          name: promotion.name
+        }
+        setFileList([item]);
+      }
+    }
+  }, [promotion]);
+
+
   const handleClose = () => {
+    form.resetFields();
+    setFileList([]);
     onClose();
   };
-  const handleAddNewPromotion = async (values: PromotionRequest) => {
+  const handlePromotion = async (values: PromotionRequest) => {
     setIsLoading(true);
     if (!isValidTimeRange(new Date(values.start), new Date(values.end))) return;
     const imageUrl: string = (await processFileList(fileList))[0];
     values.imageUrl= imageUrl;
     console.log(values);
+    const api = promotion? 
+    `${API.PROMOTIONS}/${promotion.id}` :
+    `${API.PROMOTIONS}`;
     try {
-      const res = await handleAPI(API.PROMOTIONS, values, 'post');
-      console.log(res.data);
+      const res = await handleAPI(api, values, promotion? 'put' : 'post');
+      const response: ApiResponse<PromotionResponse> = res.data; 
+      onFinish(response.result);
+      handleClose();
     } catch (error) {
       console.log(error);
     }finally{
@@ -56,7 +85,7 @@ const PromotionModal = (props: Props) => {
 
   return (
     <Modal
-      title={"Add promotion"}
+      title={(promotion ? 'Update' : 'Add') + ' promotion'}
       onClose={handleClose}
       onCancel={handleClose}
       okButtonProps={{
@@ -77,7 +106,7 @@ const PromotionModal = (props: Props) => {
           {fileList.length === 0 ? "Upload" : null}
         </Upload>
       </div>
-      <Form onFinish={handleAddNewPromotion} layout="vertical" form={form}>
+      <Form onFinish={handlePromotion} layout="vertical" form={form}>
         <Form.Item
           name={"name"}
           label={"Promotion name"}
@@ -98,10 +127,11 @@ const PromotionModal = (props: Props) => {
               name={"discountType"}
               label={"Discount type"}
               rules={[{ required: true }]}
-              initialValue={false}
+              
             >
               <Select
               allowClear
+                placeholder={'Chose discount type'}
                 options={[
                   {
 

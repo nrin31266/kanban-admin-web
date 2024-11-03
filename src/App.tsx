@@ -7,11 +7,6 @@ import store from './redux/store';
 import './App.css';
 
 message.config({
-	top: 20,
-	duration: 2,
-	maxCount: 3,
-	rtl: true,
-	prefixCls: 'my-message',
 });
 
 function App() {

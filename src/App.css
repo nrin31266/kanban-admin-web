@@ -102,6 +102,11 @@
   border: 1px solid black;
 }
 
+:where(.css-dev-only-do-not-override-1yw292k).ant-form-item .ant-form-item-label >label.ant-form-item-required:not(.ant-form-item-required-mark-optional)::before{
+  content: '***';
+  color: silver;
+}
+
 @keyframes rotation {
   0% {
     transform: rotate(0deg);
