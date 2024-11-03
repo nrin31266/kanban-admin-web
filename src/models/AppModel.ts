@@ -19,3 +19,7 @@ export interface PageResponse<T = any> {
   totalElements: number;
   data: T[];
 }
+
+export interface SoftDeleteRequest {
+  ids: string[] | number;
+}

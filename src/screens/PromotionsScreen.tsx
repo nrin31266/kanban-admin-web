@@ -1,11 +1,11 @@
-import { Avatar, Button, Modal, Space, Spin, Typography } from "antd";
+import { Avatar, Button, message, Modal, Space, Spin, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import PromotionModal from "../modals/PromotionModal";
 import Table, { ColumnProps } from "antd/es/table";
 import { PromotionResponse } from "../models/PromotionModel";
 import handleAPI from "../apis/handleAPI";
 import { API } from "../configurations/configurations";
-import { ApiResponse, PageResponse } from "../models/AppModel";
+import { ApiResponse, PageResponse, SoftDeleteRequest } from "../models/AppModel";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { FaEdit } from "react-icons/fa";
 
@@ -44,8 +44,19 @@ const PromotionsScreen = () => {
       setIsLoading(false);
     }
   };
-  const handleSoftDelete = async (id: string) => {
-    console.log(id);
+  const handleSoftDelete = async (id: string[]) => {
+    setIsLoading(true);
+    const api = `${API.PROMOTIONS}/soft-delete`;
+    const req: SoftDeleteRequest = {ids: id}; 
+    try {
+      await handleAPI(api, req, 'put');
+      message.success('Deleted');
+      getPromotions();
+    } catch (error) {
+      console.log(error);
+    }finally{
+      setIsLoading(false);
+    }
   };
 
   const columns: ColumnProps<PromotionResponse>[] = [
@@ -111,7 +122,7 @@ const PromotionsScreen = () => {
                       title: "CONFIRM",
                       content: "Are you sure want delete this promotion?",
                       onOk: () => {
-                        handleSoftDelete(promotion.id);
+                        handleSoftDelete([promotion.id]);
                       },
                     });
                   }}
