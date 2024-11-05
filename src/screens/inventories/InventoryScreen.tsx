@@ -263,8 +263,9 @@ const InventoryScreen = () => {
               gap: "4px",
             }}
           >
-            {categories.map((category: CategoryModel, _index) => (
+            {categories.map((category: CategoryModel, index) => (
               <Link
+              key={`category${index}${category.id}`}
                 to={`/categories/detail/${category.slug}?id=${category.id}`}
               >
                 <Tag
