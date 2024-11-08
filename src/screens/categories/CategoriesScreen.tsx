@@ -137,7 +137,7 @@ const CategoriesScreen = () => {
   ) : (
     <>
       <div className="container">
-        <div className="row">
+        <div className="row mt-4">
           <div className="col-md-4">
             <div>
               <AddCategory

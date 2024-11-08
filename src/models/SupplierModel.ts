@@ -1,16 +1,19 @@
-export interface SupplierModel {
-    id: string
-    photoUrl: string
-    slug: string
-    name: string
-    product: string
-    categories: any
-    price: number
-    contact: string
-    talking: boolean
-    onTheWay: number
-    email: string
-    createdAt: string
-    updatedAt: string
-  }
-  
+export interface SupplierRequest {
+  name: string
+  contactPerson: string
+  email: string
+  slug: string
+  photoUrl: string
+}
+
+export interface SupplierResponse {
+  id: string
+  name: string
+  photoUrl: string
+  slug: string
+  contactPerson: string
+  email: string
+  createdAt: string
+  updatedAt: string
+}
+

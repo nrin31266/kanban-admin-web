@@ -57,8 +57,9 @@ const PromotionModal = (props: Props) => {
     onClose();
   };
   const handlePromotion = async (values: PromotionRequest) => {
-    setIsLoading(true);
+    
     if (!isValidTimeRange(new Date(values.start), new Date(values.end))) return;
+    setIsLoading(true);
     const imageUrl: string = (await processFileList(fileList))[0];
     values.imageUrl= imageUrl;
     console.log(values);

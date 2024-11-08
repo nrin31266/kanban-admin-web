@@ -20,7 +20,7 @@ import {
 import handleAPI from "../../apis/handleAPI";
 import { API, colors } from "../../configurations/configurations";
 import { SelectModel, TreeModel } from "./../../models/FormModel";
-import { SupplierModel } from "../../models/SupplierModel";
+import { SupplierResponse } from "../../models/SupplierModel";
 import { replace, useNavigate, useSearchParams } from "react-router-dom";
 import { replaceName } from "../../utils/replaceName";
 import {
@@ -150,7 +150,7 @@ const AddProduct = () => {
   const getSuppliers = async () => {
     const res = await handleAPI(API.SUPPLIER);
     const data = res.data.result.data;
-    const options = data.map((item: SupplierModel) => ({
+    const options = data.map((item: SupplierResponse) => ({
       value: item.id,
       label: `Name: ${item.name}, Email: ${item.email}`,
     }));
@@ -192,18 +192,11 @@ const AddProduct = () => {
               <Input maxLength={150} showCount />
             </Form.Item>
             <Card size="small" className="mt-4" title="Supplier">
-              <Form.Item
-                rules={[
-                  {
-                    required: true,
-                    message: "Required",
-                  },
-                ]}
-                name={"supplierId"}
-              >
+              <Form.Item name={"supplierId"}>
                 <Select
                   placeholder={"Select supplier"}
                   showSearch
+                  allowClear
                   filterOption={(input, option) =>
                     replaceName(option?.label ? option.label : "").includes(
                       replaceName(input)
