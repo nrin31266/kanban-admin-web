@@ -8,13 +8,16 @@ import {
   Space,
   TreeSelect,
   Typography,
+  Upload,
+  UploadFile,
 } from "antd";
 import React, { useEffect, useState } from "react";
 import { API } from "../configurations/configurations";
 import handleAPI from "../apis/handleAPI";
 import { TreeModel } from "../models/FormModel";
 import { replaceName } from "../utils/replaceName";
-import { CategoryModel, CategoryTableData } from "../models/Products";
+import { changeFileListToUpload, processFileList } from "../utils/uploadFile";
+import { CategoryTableData } from "../models/CategoryModel";
 
 interface Props {
   selected?: CategoryTableData;
@@ -26,45 +29,50 @@ const AddCategory = (props: Props) => {
   const { onAddNew, values, selected, onClose } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [form] = Form.useForm();
+  const [fileList, setFileList] = useState<any[]>([]);
 
-  const handleAddSubmit = async (values: any) => {
-    setIsLoading(true);
-    if (!values.parentId) values.parentId = null;
-    values.slug = replaceName(values.name);
+  const handleSubmit = async (values: any) =>{
+    if(fileList.length !== 1){
+      message.error('Please add image of category');
+      return;
+    }
+    const imageUrl = await processFileList(fileList);
+    values.imageUrl=imageUrl[0];
+    const api = selected ? `${API.CATEGORY}/${selected.key}` : API.CATEGORY;
     try {
-      await handleAPI(API.CATEGORY, values, "post");
-      message.success("Create category successfully!");
+      await handleAPI(api, values, selected? 'put' : 'post');
+      if(selected){
+        message.success("Update category successfully!");
+      }else{
+        message.success("Create category successfully!");
+      }
       onAddNew();
       form.resetFields();
-    } catch (error: any) {
-      message.error(error.message);
-    } finally {
-      setIsLoading(false);
+      setFileList([]);
+    } catch (error) {
+      console.log(error);
     }
-  };
-  const handleUpdateSubmit = async (values: any, id: string) => {
-    setIsLoading(false);
-
-    if (!values.parentId) values.parentId = null;
-    values.slug = replaceName(values.name);
-    try {
-      await handleAPI(`${API.CATEGORY}/${id}`, values, "put");
-      message.success("Update category successfully!");
-
-      onAddNew();
-      form.resetFields();
-    } catch (error: any) {
-      message.error(error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }
 
   useEffect(() => {
     if (selected) {
       form.setFieldsValue(selected);
+      if(selected.imageUrl){
+        const item ={
+          url: selected.imageUrl,
+          status: 'done',
+          uid: 'blabala',
+          name: selected.name
+        }
+        setFileList([item]);
+      }
     }
   }, [selected]);
+
+  const handleChangeFile = (val:any) =>{
+    const files: UploadFile[] = val.fileList;
+    setFileList(changeFileListToUpload(files));
+  }
 
   return (
     <Card
@@ -74,14 +82,22 @@ const AddCategory = (props: Props) => {
         </Typography.Text>
       }
     >
+      <div className="mb-3">
+        <Upload
+          accept="image/*"
+          listType="picture-card"
+          fileList={fileList}
+          onChange={handleChangeFile}
+        >
+          {fileList.length === 0 ? "Upload" : null}
+        </Upload>
+      </div>
       <Form
         disabled={isLoading}
         layout="vertical"
         form={form}
         onFinish={(values) => {
-          selected
-            ? handleUpdateSubmit(values, selected.key)
-            : handleAddSubmit(values);
+          handleSubmit(values);
         }}
         size="large"
       >
@@ -138,6 +154,7 @@ const AddCategory = (props: Props) => {
             onClick={() => {
               form.resetFields();
               onClose();
+              setFileList([]);
             }}
           >
             Cancel

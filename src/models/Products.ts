@@ -9,16 +9,7 @@ export interface CategoryModel {
   createdAt: string;
   updatedAt: string;
 }
-export interface CategoryTableData {
-  key: string;
-  name: string;
-  description: string;
-  slug: string;
-  parentId: any;
-  createdAt: string;
-  updatedAt: string;
-  children?: CategoryTableData[];
-}
+
 
 export interface ProductModel {
   id: string
