@@ -28,6 +28,7 @@ export interface ProductModel {
 
 export interface ProductResponse {
   id: string
+  options: string[];
   title: string
   description: string
   slug: string
@@ -41,6 +42,7 @@ export interface ProductResponse {
 }
 
 export interface ProductRequest {
+  options: string[];
   title: string
   description: string
   slug: string
