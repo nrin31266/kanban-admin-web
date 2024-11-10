@@ -103,23 +103,6 @@ const ProductDetail = () => {
     }
   };
 
-  // const handleUpdateSubProduct = async (
-  //   subProductRequest: SubProductRequest,
-  //   subProductId: string
-  // ) => {
-  //   const api = `${API.SUB_PRODUCTS}/${subProductId}`;
-  //   setIsLoading(true);
-  //   try {
-  //     const res = await handleAPI(api, subProductRequest, "put");
-  //     message.success("Update successfully!");
-  //     getSubProducts();
-  //   } catch (error) {
-  //     console.log(error);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
   const columns: ColumnProps<SubProductResponse>[] = [
     {
       key: "images",
@@ -160,12 +143,11 @@ const ProductDetail = () => {
       dataIndex: "discount",
       title: "Discount",
       render: (discount: number) => {
-        if(discount){
+        if (discount) {
           return FormatCurrency.VND.format(discount);
-        }else{
-          return 'N/A';
+        } else {
+          return "N/A";
         }
-        
       },
     },
     {
@@ -174,42 +156,33 @@ const ProductDetail = () => {
       title: "Quantity",
     },
     {
-      key: "size",
-      dataIndex: "size",
-      title: "Size",
-      render: (size) => {
-        if (!size) {
-          return (
-            <Typography.Title level={5} type="secondary">
-              No size
-            </Typography.Title>
-          );
+      key: "options",
+      dataIndex: "options",
+      title: "Options",
+      render: (options: any) => {
+        if (product && product.options && product.options.length > 0) {
+          return product.options.map((option) => {
+            const value = options[option];
+            if (value) {
+              return (
+                option=== 'Color' ? <div className="d-flex">
+                  <strong>{option}:</strong>
+                  <div style={{width: 30, height: 30, backgroundColor: value}}></div>
+                </div> :
+                <div key={option}>
+                  <strong>{option}:</strong>
+
+                  <Tag>{value}</Tag>
+                </div>
+              );
+            }
+            return <span key={option}>No values for {option}</span>;
+          });
         }
-        return <Tag>{size}</Tag>;
-      },
-      align: "center",
-    },
-    {
-      key: "color",
-      dataIndex: "color",
-      title: "Color",
-      align: "center",
-      render: (color) => {
-        if (!color) {
-          return (
-            <Typography.Title level={5} type="secondary">
-              No color
-            </Typography.Title>
-          );
-        }
-        return (
-          <div className="d-flex">
-            <div className="div-color-50" style={{ backgroundColor: color }} />
-            {color}
-          </div>
-        );
+        return <span>No options available</span>;
       },
     },
+
     {
       key: "action",
       dataIndex: "",
@@ -295,14 +268,14 @@ const ProductDetail = () => {
         />
       </div>
       <ModalAddSubProduct
-      product={product}
+        product={product}
         onClose={() => {
           setIsVisibleModalAddSubProduct(false);
           setSubProductSelected(undefined);
         }}
         visible={isVisibleModalAddSubProduct}
         subProduct={subProductSelected}
-        onUpdated={() => {
+        onFinish={() => {
           setSubProductSelected(undefined);
           getSubProducts();
         }}

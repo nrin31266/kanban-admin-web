@@ -51,9 +51,8 @@ export interface SubProductResponse{
   updatedAt: string
 }
 export interface SubProductRequest{
-  size: string
+  options: Map<String, String[]>
   discount: number
-  color: any
   price: number
   productId: string
   quantity: number
