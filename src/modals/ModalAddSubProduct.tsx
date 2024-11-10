@@ -11,9 +11,7 @@ import {
 } from "antd";
 import React, { useEffect, useState } from "react";
 import {
-  ProductModel,
   ProductResponse,
-  SubProductModel,
   SubProductRequest,
   SubProductResponse,
 } from "../models/Products";
@@ -24,9 +22,9 @@ import handleAPI from "../apis/handleAPI";
 interface Props {
   visible: boolean;
   onClose: () => void;
-  product?: ProductModel | ProductResponse;
+  product?: ProductResponse | undefined;
   subProduct?: SubProductResponse;
-  onAddNew?: (values: SubProductModel) => void;
+  onAddNew?: (values: SubProductResponse) => void;
   onUpdated?: () => void;
 }
 
@@ -41,7 +39,6 @@ const ModalAddSubProduct = (props: Props) => {
     if (subProduct) {
       console.log(subProduct);
       form.setFieldsValue(subProduct);
-      subProduct.color && setColor(subProduct.color);
       if (subProduct.images && subProduct.images.length > 0) {
         const imgs: any = [];
         subProduct.images.forEach((urlImg, index) => {

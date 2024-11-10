@@ -1,4 +1,6 @@
+import { CategoryResponse } from "./CategoryModel";
 import { TreeModel } from "./FormModel";
+import { SupplierResponse } from "./SupplierModel";
 
 export interface CategoryModel {
   id: string;
@@ -9,23 +11,6 @@ export interface CategoryModel {
   createdAt: string;
   updatedAt: string;
 }
-
-
-export interface ProductModel {
-  id: string
-  title: string
-  description: string
-  slug: string
-  supplierId: string
-  content: string
-  expiredDate: any
-  images: string[]
-  categories: CategoryModel[]
-  createdAt: string
-  updatedAt: string
-  subProductResponse?: SubProductModel[];
-}
-
 export interface ProductResponse {
   id: string
   options: string[];
@@ -39,8 +24,10 @@ export interface ProductResponse {
   categoryIds: string[]
   createdAt: string
   updatedAt: string
-}
 
+  supplierResponse: SupplierResponse
+  categoryResponse: CategoryResponse[]
+}
 export interface ProductRequest {
   options: string[];
   title: string
@@ -52,24 +39,9 @@ export interface ProductRequest {
   images: string[]
   categoryIds: string[]
 }
-
-
-
-export interface SubProductModel {
-  size: string
-  color: any
-  price: number
-  quantity: number
-  images: string[]
-  product: ProductModel
-  createdAt: string
-  updatedAt: string
-}
-
 export interface SubProductResponse{
   id: string
-  size: string
-  color: any
+  options: Map<String, String[]>
   discount: number
   price: number
   quantity: number

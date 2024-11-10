@@ -3,7 +3,7 @@ import {
   CategoryModel,
   FilterProductValue,
   FilterValueResponse,
-  ProductModel,
+  SubProductResponse,
   ProductResponse,
   ProductsFilterValuesRequest,
 } from "../models/Products";

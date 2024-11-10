@@ -17,18 +17,14 @@ import {
 import React, { useEffect, useState } from "react";
 import {
   CategoryModel,
-  FilterProductValue,
-  ProductModel,
   ProductResponse,
   ProductsFilterValuesRequest,
-  SubProductModel,
 } from "../../models/Products";
 import handleAPI from "../../apis/handleAPI";
 import { API, colors } from "../../configurations/configurations";
 import { ColumnProps, TableProps } from "antd/es/table";
 import { Link, useNavigate } from "react-router-dom";
 import { MdLibraryAdd } from "react-icons/md";
-import { ModalAddSubProduct } from "../../modals";
 import { Edit2, Sort, Trash } from "iconsax-react";
 import { TiTick } from "react-icons/ti";
 import { PaginationResponseModel } from "../../models/AppModel";
@@ -36,6 +32,8 @@ import { replaceName } from "../../utils/replaceName";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import { FaEdit } from "react-icons/fa";
 import { FilterProduct } from "../../components";
+import { CategoryResponse } from "../../models/CategoryModel";
+import { SupplierResponse } from "../../models/SupplierModel";
 const { confirm } = Modal;
 
 type TableRowSelection<T extends object = object> =
@@ -44,11 +42,9 @@ type TableRowSelection<T extends object = object> =
 const InventoryScreen = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isInitLoading, setIsInitLoading] = useState<boolean>(false);
-  const [products, setProducts] = useState<ProductModel[]>([]);
-  const [isVisibleModalAddSubProduct, setIsVisibleModalAddSubProduct] =
-    useState<boolean>(false);
+  const [products, setProducts] = useState<ProductResponse[]>([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [productSelected, setProductSelected] = useState<ProductModel>();
+  const [productSelected, setProductSelected] = useState<ProductResponse>();
   const [paginationPage, setPaginationPage] = useState<number>(1);
   const [paginationSize, setPaginationSize] = useState<number>(10);
   const [allowSelectRows, setAllowSelectRows] = useState<boolean>(false);
@@ -181,11 +177,11 @@ const InventoryScreen = () => {
     setIsLoading(true);
     setSearchKey("");
   };
-  const rowSelection: TableRowSelection<ProductModel> = {
+  const rowSelection: TableRowSelection<ProductResponse> = {
     selectedRowKeys,
     onChange: onSelectChange,
   };
-  const columns: ColumnProps<ProductModel>[] = [
+  const columns: ColumnProps<ProductResponse>[] = [
     {
       key: "index",
       dataIndex: undefined,
@@ -200,7 +196,7 @@ const InventoryScreen = () => {
       dataIndex: "",
       title: "Title",
       width: 190,
-      render: (item: ProductModel) => (
+      render: (item: ProductResponse) => (
         <Link to={`/inventory/detail/${item.slug}?id=${item.id}`}>
           {item.title}
         </Link>
@@ -250,10 +246,10 @@ const InventoryScreen = () => {
     },
     {
       key: "categories",
-      dataIndex: "categories",
+      dataIndex: "categoryResponse",
       title: "Categories",
       width: 300,
-      render: (categories: CategoryModel[]) =>
+      render: (categories: CategoryResponse[]) =>
         categories &&
         categories.length > 0 && (
           <div
@@ -274,9 +270,6 @@ const InventoryScreen = () => {
                     padding: "5px",
                     fontSize: "15px",
                   }}
-                  // color={
-                  //   listColors[Math.floor(Math.random() * listColors.length)]
-                  // }
                 >
                   {category.name}
                 </Tag>
@@ -285,141 +278,26 @@ const InventoryScreen = () => {
           </div>
         ),
     },
-
     {
-      key: "colors",
-      dataIndex: "subProductResponse",
-      title: "Color",
-      width: 200,
-      render: (items: SubProductModel[]) => {
-        if (!items || items.length === 0) {
-          return <span className="text-secondary">No color</span>;
-        }
-
-        const colors: string[] = [];
-
-        items.forEach((sub) => {
-          if (!colors.includes(sub.color)) {
-            colors.push(sub.color);
-          }
-        });
-
-        return (
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-            }}
-          >
-            {colors.map(
-              (color, index) =>
-                color && (
-                  <div
-                    style={{
-                      margin: "2px",
-                      width: 30,
-                      height: 30,
-                      backgroundColor: color,
-                      borderRadius: "5%",
-                      border: "1px solid black",
-                    }}
-                    key={`color-${color}-${index}`}
-                  />
-                )
-            )}
-          </div>
-        );
-      },
-    },
-
-    {
-      key: "sizes",
-      dataIndex: "subProductResponse",
-      title: "Sizes",
+      key: 'options',
+      title: 'Options list',
+      dataIndex: 'options',
       width: 300,
-      render: (items: SubProductModel[]) => {
-        if (!items || items.length === 0) {
-          return <span className="text-secondary">No size</span>;
-        }
-        return (
-          <Space wrap>
-            {items.length > 0 &&
-              items.map((item, index) => (
-                <Tag
-                  style={{
-                    margin: "0",
-                    padding: "5px",
-                    fontSize: "15px",
-                  }}
-                  key={`size${item.size}-${index}`}
-                >
-                  {item.size}
-                </Tag>
-              ))}
-          </Space>
-        );
-      },
+      render: (options: string[])=> options && options.map((option, index)=><Tag key={'option'+ index}>{option}</Tag>)
     },
     {
-      key: "prices",
-      dataIndex: "subProductResponse",
-      title: "Prices",
-      width: 250,
-      render: (items: SubProductModel[]) => {
-        if (!items || items.length === 0) {
-          return <span className="text-secondary">N/A</span>;
-        }
-
-        // Nếu chỉ có một item, trả về giá trị price của item đó
-        if (items.length === 1) {
-          return items[0].price.toLocaleString();
-        }
-
-        // Tìm giá trị nhỏ nhất và lớn nhất của price
-        const prices = items
-          .filter((item) => item.price) // Lọc các item có giá trị price
-          .map((item) => item.price); // Lấy danh sách các price
-
-        if (prices.length === 0) {
-          return ""; // Không có giá trị price hợp lệ
-        }
-
-        const minPrice = Math.min(...prices).toLocaleString();
-        const maxPrice = Math.max(...prices).toLocaleString();
-
-        // Nếu min và max bằng nhau, chỉ hiển thị một giá trị, ngược lại hiển thị range
-        return minPrice === maxPrice ? minPrice : `${minPrice} - ${maxPrice}`;
-      },
+      key: 'supplier',
+      title: 'Supplier',
+      dataIndex: 'supplierResponse',
+      width: 100,
+      render: (supplier: SupplierResponse)=> supplier && supplier.photoUrl && <Avatar size={50} src={supplier.photoUrl}/>
     },
-
-    {
-      key: "quantity",
-      dataIndex: "subProductResponse",
-      title: "Quantity",
-      width: 200,
-      render: (items: SubProductModel[]) => {
-        if (!items || items.length === 0) {
-          return <span className="text-secondary">0</span>;
-        }
-
-        let quantity = 0;
-
-        items.forEach((item) => {
-          if (item.quantity) {
-            quantity += item.quantity;
-          }
-        });
-
-        return quantity;
-      },
-    },
-
     {
       key: "action",
       dataIndex: "",
       width: 100,
       title: "Action",
-      render: (product: ProductModel) => (
+      render: (product: ProductResponse) => (
         <Space>
           <Tooltip title={"Add sub product"} key={"addSubProduct"}>
             <Button
@@ -427,8 +305,7 @@ const InventoryScreen = () => {
               size="small"
               type="text"
               onClick={() => {
-                setIsVisibleModalAddSubProduct(true);
-                setProductSelected(product);
+                navigate(`/inventory/detail/${product.slug}?id=${product.id}`);
               }}
             >
               <MdLibraryAdd color={colors.primary500} size={20} />
@@ -628,17 +505,6 @@ const InventoryScreen = () => {
           />
         </div>
       </div>
-      <ModalAddSubProduct
-        onAddNew={(values: SubProductModel) => {
-          getProducts();
-        }}
-        product={productSelected}
-        onClose={() => {
-          setIsVisibleModalAddSubProduct(false);
-          setProductSelected(undefined);
-        }}
-        visible={isVisibleModalAddSubProduct}
-      />
     </>
   );
 };
