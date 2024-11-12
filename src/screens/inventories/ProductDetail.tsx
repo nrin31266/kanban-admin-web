@@ -168,6 +168,7 @@ const ProductDetail = () => {
                 option=== 'Color' ? <div className="d-flex">
                   <strong>{option}:</strong>
                   <div style={{width: 30, height: 30, backgroundColor: value}}></div>
+                  {value}
                 </div> :
                 <div key={option}>
                   <strong>{option}:</strong>

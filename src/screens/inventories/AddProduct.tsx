@@ -91,6 +91,9 @@ const AddProduct = () => {
         });
         setFileList((prev) => [...prev, ...imgs]);
       }
+      if(product.options && product.options.length>0){
+        setOptions(product.options);
+      }
     }
   }, [product]);
 

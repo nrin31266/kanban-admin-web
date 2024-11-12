@@ -1,6 +1,5 @@
 import {
   ColorPicker,
-  theme,
   Form,
   Input,
   InputNumber,
@@ -8,23 +7,13 @@ import {
   Modal,
   Typography,
   Upload,
-  UploadProps,
-  ColorPickerProps,
 } from "antd";
 import React, { useEffect, useState } from "react";
-import {
-  ProductResponse,
-  SubProductRequest,
-  SubProductResponse,
-} from "../models/Products";
+import { ProductResponse, SubProductRequest, SubProductResponse } from "../models/Products";
 import { API } from "../configurations/configurations";
-import {
-  changeFileListToUpload,
-  processFileList,
-  uploadFiles,
-} from "../utils/uploadFile";
-import { generate, green, presetPalettes, red } from "@ant-design/colors";
+import { processFileList, changeFileListToUpload } from "../utils/uploadFile";
 import handleAPI from "../apis/handleAPI";
+import { colors } from "./../configurations/configurations";
 
 interface Props {
   visible: boolean;
@@ -34,12 +23,13 @@ interface Props {
   onFinish: () => void;
 }
 
-const ModalAddSubProduct = (props: Props) => {
+const ModalAddSubProduct = ({ visible, onClose, product, subProduct, onFinish }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { visible, onClose, product, subProduct, onFinish } = props;
+  const [fileList, setFileList] = useState<any[]>([]);
+  const [color, setColor] = useState<string>();
   const [form] = Form.useForm();
   const [optionsForm] = Form.useForm();
-  const [fileList, setFileList] = useState<any[]>([]);
+
   const presets = [
     {
       label: "Basic Colors",
@@ -99,175 +89,99 @@ const ModalAddSubProduct = (props: Props) => {
 
   useEffect(() => {
     if (subProduct) {
-      console.log(subProduct);
       form.setFieldsValue(subProduct);
-      if (subProduct.images && subProduct.images.length > 0) {
-        const imgs: any = [];
-        subProduct.images.forEach((urlImg, index) => {
-          imgs.push({
-            uid: index,
-            name: `image-${index}`,
-            status: "done",
-            url: urlImg,
-          });
-        });
-        setFileList((prev) => [...prev, ...imgs]);
-      }
       optionsForm.setFieldsValue(subProduct.options);
+      subProduct.images?.forEach((urlImg, index) =>
+        setFileList(prev => [
+          ...prev,
+          { uid: index, name: `image-${index}`, status: "done", url: urlImg },
+        ])
+      );
+      setColor(subProduct.options?.["Color"]);
     }
   }, [subProduct]);
 
   const handleClose = () => {
+    optionsForm.resetFields();
     form.resetFields();
     setFileList([]);
+    setColor(undefined);
     onClose();
-    optionsForm.resetFields();
   };
 
   const handleSubmit = async () => {
-    optionsForm
-      .validateFields()
-      .then((optionsFormValue) => {
-        if (optionsFormValue.Color) {
-          optionsFormValue.Color = optionsFormValue.Color.toHexString();
-        }
-        form
-          .validateFields()
-          .then(async (formValues) => {
-            const values: SubProductRequest = {
-              ...formValues,
-              options: optionsFormValue,
-            };
-            console.log(values);
-            setIsLoading(true);
-            if (subProduct) values.productId = subProduct.productId;
-            else values.productId = product.id;
+    try {
+      const optionsFormValue = await optionsForm.validateFields();
+      if (optionsFormValue.Color) optionsFormValue.Color = color;
 
-            if (fileList && fileList.length > 0) {
-              const imagesUrl = await processFileList(fileList);
-              if (imagesUrl.length > 0) values.images = imagesUrl;
-            }
+      const formValues = await form.validateFields();
+      const values: SubProductRequest = { ...formValues, options: optionsFormValue };
+      values.productId = subProduct?.productId || product.id;
 
-            const api = subProduct
-              ? `${API.SUB_PRODUCTS}/${subProduct.id}`
-              : `${API.SUB_PRODUCTS}`;
+      if (fileList.length > 0) {
+        const imagesUrl = await processFileList(fileList);
+        if (imagesUrl.length > 0) values.images = imagesUrl;
+      }
 
-            try {
-              await handleAPI(api, values, subProduct ? "put" : "post");
-              message.success(
-                (subProduct ? "Update" : "Add") + " successfully!"
-              );
-              onFinish();
-              handleClose();
-            } catch (error) {
-              message.error("Error when adding sub product!");
-              console.log(error);
-            } finally {
-              setIsLoading(false);
-            }
-          })
-          .catch((error) => {
-            console.log("Form 2 validation failed:", error);
-          });
-      })
-      .catch((error) => {
-        console.log("Options form validation failed:", error);
-      });
+      const api = subProduct ? `${API.SUB_PRODUCTS}/${subProduct.id}` : API.SUB_PRODUCTS;
+      await handleAPI(api, values, subProduct ? "put" : "post");
+      message.success(`${subProduct ? "Update" : "Add"} successfully!`);
+      onFinish();
+      handleClose();
+    } catch (error) {
+      message.error("Error when adding sub product!");
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <Modal
-      onOk={() => handleSubmit()}
-      okButtonProps={{
-        loading: isLoading,
-      }}
-      title={
-        <Typography.Title>
-          {subProduct ? "Update sub product" : "Add sub product"}
-        </Typography.Title>
-      }
+      onOk={handleSubmit}
+      okButtonProps={{ loading: isLoading }}
+      title={<Typography.Title>{subProduct ? "Update" : "Add"} Sub Product</Typography.Title>}
       open={visible}
       onCancel={handleClose}
       onClose={handleClose}
     >
-      <Typography.Title level={4}>
-        {"Main product: "}
-        {product.title}
-      </Typography.Title>
-      <Form
-        size="large"
-        disabled={isLoading}
-        layout="vertical"
-        form={optionsForm}
-      >
-        {product.options &&
-          product.options.map((option, index) => (
-            <div key={"option" + index}>
-              {option === "Color" || option === "color" ? (
-                <div className="d-flex">
-                  <Form.Item
-                    name={option}
-                    label={option}
-                    rules={[
-                      { required: true, message: `${option} is required!` },
-                    ]}
-                  >
-                    <ColorPicker presets={presets} />
-                  </Form.Item>
-                </div>
-              ) : (
-                <Form.Item
-                  name={option}
-                  label={option}
-                  rules={[
-                    { required: true, message: `${option} is required!` },
-                  ]}
-                >
-                  <Input style={{ width: "100%" }} />
-                </Form.Item>
-              )}
-            </div>
-          ))}
+      <Typography.Title level={4}>Main product: {product.title}</Typography.Title>
+
+      <Form size="large" disabled={isLoading} layout="vertical" form={optionsForm}>
+        {product.options?.map((option, index) => (
+          <Form.Item
+            key={index}
+            name={option}
+            label={option}
+            rules={[{ required: true, message: `${option} is required!` }]}
+          >
+            {option === "Color" ? (
+              <ColorPicker presets={presets} onChange={v => setColor(v.toHexString())} />
+            ) : (
+              <Input />
+            )}
+          </Form.Item>
+        ))}
       </Form>
+
       <Form layout="vertical" size="large" form={form} disabled={isLoading}>
         <div className="row">
-          <div className="col">
-            <Form.Item
-              name={"quantity"}
-              label="Quantity"
-              rules={[{ required: true }]}
-            >
-              <InputNumber style={{ width: "100%" }} />
-            </Form.Item>
-          </div>
-          <div className="col">
-            <Form.Item
-              name={"price"}
-              label="Price"
-              rules={[{ required: true }]}
-            >
-              <InputNumber style={{ width: "100%" }} />
-            </Form.Item>
-          </div>
-          <div className="col">
-            <Form.Item
-              name={"discount"}
-              label="Discount"
-              rules={[{ required: true }]}
-            >
-              <InputNumber style={{ width: "100%" }} />
-            </Form.Item>
-          </div>
+          {["quantity", "price", "discount"].map(field => (
+            <div key={field} className="col">
+              <Form.Item name={field} label={field} rules={[{ required: true }]}>
+                <InputNumber style={{ width: "100%" }} />
+              </Form.Item>
+            </div>
+          ))}
         </div>
       </Form>
+
       <Upload
         multiple
         fileList={fileList}
         accept="image/*"
         listType="picture-card"
-        onChange={(newFileList) =>
-          setFileList(changeFileListToUpload(newFileList.fileList))
-        }
+        onChange={newFileList => setFileList(changeFileListToUpload(newFileList.fileList))}
       >
         Upload
       </Upload>

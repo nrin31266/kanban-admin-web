@@ -41,7 +41,7 @@ export interface ProductRequest {
 }
 export interface SubProductResponse{
   id: string
-  options: Map<String, String[]>
+  options: Record<string, any>;
   discount: number
   price: number
   quantity: number
@@ -51,7 +51,7 @@ export interface SubProductResponse{
   updatedAt: string
 }
 export interface SubProductRequest{
-  options: Map<String, String[]>
+  options: Record<string, any>;
   discount: number
   price: number
   productId: string
