@@ -168,7 +168,7 @@ const ModalAddSubProduct = ({ visible, onClose, product, subProduct, onFinish }:
         <div className="row">
           {["quantity", "price", "discount"].map(field => (
             <div key={field} className="col">
-              <Form.Item name={field} label={field} rules={[{ required: true }]}>
+              <Form.Item name={field} label={field} rules={[{  required:  field !== 'discount' ? true : false }]}>
                 <InputNumber style={{ width: "100%" }} />
               </Form.Item>
             </div>

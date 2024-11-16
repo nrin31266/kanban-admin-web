@@ -17,7 +17,6 @@ const ModalCategory = (props: Props) => {
 
   const handleOnClose = () => {
     onClose();
-    form.resetFields();
   };
   return (
     <>
