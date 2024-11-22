@@ -32,10 +32,6 @@ const AddCategory = (props: Props) => {
   const [fileList, setFileList] = useState<any[]>([]);
 
   const handleSubmit = async (values: any) =>{
-    if(fileList.length !== 1){
-      message.error('Please add image of category');
-      return;
-    }
     const imageUrl = await processFileList(fileList);
     values.imageUrl=imageUrl[0];
     const api = selected ? `${API.CATEGORY}/${selected.key}` : API.CATEGORY;
