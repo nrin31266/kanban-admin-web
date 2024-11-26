@@ -9,28 +9,42 @@ import { API } from "../configurations/configurations";
 import handleAPI from "../apis/handleAPI";
 import { PageResponse } from "../models/AppModel";
 import Table, { ColumnProps } from "antd/es/table";
-import { Button, Tabs, TabsProps, Typography } from "antd";
+import { Button, message, Tabs, TabsProps, Typography } from "antd";
 import { FormatCurrency } from "../utils/formatNumber";
 import LoadingComponent from "../components/LoadingComponent";
 import { colors } from "../constants/listColors";
 
 const OrdersScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState<PageResponse<OrderResponse>>();
+  const [pageData, setPageData] = useState<PageResponse<OrderResponse>>({
+    data: [],
+    currentPage: 0,
+    pageSize: 0,
+    totalElements: 0,
+    totalPages: 0,
+  });
   const pageRef = useRef(1);
   const [keyStatus, setKeyStatus] = useState<string>(Status.PENDING);
   const isInitLoad = useRef(true);
   const [isInitLoading, setIsInitLoading] = useState(false);
 
-  useEffect(() => {
-    if (isInitLoad.current) {
-      getData();
-      isInitLoad.current = false;
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (isInitLoad.current) {
+  //     getData();
+  //     isInitLoad.current = false;
+  //   }
+  // }, []);
+
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
-    getOrders();
+    if (isFirstRender.current) {
+      // Nếu là lần render đầu tiên, bỏ qua việc gọi API
+      isFirstRender.current = false;
+    } else {
+      // Nếu không phải lần render đầu tiên, gọi API
+      getOrders();
+    }
   }, [keyStatus]);
 
   const getData = async () => {
@@ -39,12 +53,13 @@ const OrdersScreen = () => {
     setIsInitLoading(false);
   };
 
-  const getOrders = async () => {
+  const getOrders = async (page?: number) => {
     setIsLoading(true);
-    const urlApi = `${API.ORDERS}/ad?page=${pageRef.current}&status=${keyStatus}`;
+    const pageNow = page ?? pageRef.current;
+    const urlApi = `${API.ORDERS}/ad?page=${pageNow}&status=${keyStatus}`;
     try {
       const res = await handleAPI(urlApi);
-      setData(res.data.result);
+      setPageData(res.data.result);
       console.log(res.data);
     } catch (error) {
       console.log(error);
@@ -82,6 +97,26 @@ const OrdersScreen = () => {
       label: "Returns",
     },
   ];
+
+  const updateOrderStatus = async (status: string, orderId: string) => {
+    const api = `${API.ORDERS}/status/${status}/${orderId}`;
+    setIsLoading(true);
+    try {
+      await handleAPI(api, undefined, "put");
+      const newData = pageData.data.filter((item) => item.id !== orderId);
+      if (newData.length === 0) {
+        await getOrders(1);
+      } else {
+        setPageData((pre) => ({ ...pre, data: newData }));
+      }
+      message.success("Ok");
+    } catch (error: any) {
+      console.log(error);
+      message.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const columns: ColumnProps<OrderResponse>[] = [
     {
@@ -200,21 +235,79 @@ const OrdersScreen = () => {
       title: "Actions",
       render: (item: OrderResponse) => (
         <div>
-          {item.status === Status.PENDING && (
-            <div className="mb-2">
-              <Button style={{ backgroundColor: colors[3] }}>
-                Confirm
-              </Button>
-              <Button className="btn-danger ml-3" size="small">
-                Deny
-              </Button>
-            </div>
-          )}
+          <div className="mb-2">
+            <Button
+              className="m-1"
+              hidden={keyStatus !== Status.PENDING}
+              onClick={() => {
+                updateOrderStatus(Status.CONFIRMED, item.id);
+              }}
+              style={{ backgroundColor: colors[3] }}
+            >
+              Confirm
+            </Button>
+            <Button
+              hidden={keyStatus === Status.CANCELLED}
+              onClick={() => {
+                updateOrderStatus(Status.CANCELLED, item.id);
+              }}
+              className="btn-danger m-1"
+              size="small"
+            >
+              Deny
+            </Button>
+          </div>
           <div>
-            <Button className="m-1" size="small">Shipping</Button>
-            <Button className="m-1" size="small">Delivered</Button>
-            <Button className="m-1" size="small">Completed</Button>
-            <Button className="m-1" size="small">Give back</Button>
+            <Button
+              hidden={keyStatus === Status.PENDING}
+              onClick={() => {
+                updateOrderStatus(Status.PENDING, item.id);
+              }}
+              className="m-1"
+              size="small"
+            >
+              Pending
+            </Button>
+            <Button
+              hidden={keyStatus === Status.SHIPPING}
+              onClick={() => {
+                updateOrderStatus(Status.SHIPPING, item.id);
+              }}
+              className="m-1"
+              size="small"
+            >
+              Shipping
+            </Button>
+            <Button
+              hidden={keyStatus === Status.DELIVERED}
+              onClick={() => {
+                updateOrderStatus(Status.DELIVERED, item.id);
+              }}
+              className="m-1"
+              size="small"
+            >
+              Delivered
+            </Button>
+            <Button
+              hidden={keyStatus === Status.COMPLETED}
+              onClick={() => {
+                updateOrderStatus(Status.COMPLETED, item.id);
+              }}
+              className="m-1"
+              size="small"
+            >
+              Completed
+            </Button>
+            <Button
+              hidden={keyStatus === Status.RETURNS}
+              onClick={() => {
+                updateOrderStatus(Status.RETURNS, item.id);
+              }}
+              className="m-1"
+              size="small"
+            >
+              Give back
+            </Button>
           </div>
         </div>
       ),
@@ -238,23 +331,23 @@ const OrdersScreen = () => {
         items={items}
         onChange={onChange}
       />
-      {data && (
+      {pageData && (
         <Table
           rowClassName={() => "custom-row"}
           scroll={{ x: "max-content", y: "calc(100vh - 250px)" }}
           pagination={{
             size: "small",
-            current: data.currentPage,
+            current: pageData.currentPage,
             showQuickJumper: false,
-            total: data.totalElements,
+            total: pageData.totalElements,
             onChange: (page, _pageSize) => {
               console.log(page);
             },
-            pageSize: data.pageSize,
+            pageSize: pageData.pageSize,
           }}
           loading={isLoading}
           columns={columns}
-          dataSource={data.data}
+          dataSource={pageData.data}
         ></Table>
       )}
     </div>
