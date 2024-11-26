@@ -9,8 +9,10 @@ import { API } from "../configurations/configurations";
 import handleAPI from "../apis/handleAPI";
 import { PageResponse } from "../models/AppModel";
 import Table, { ColumnProps } from "antd/es/table";
-import { Tabs, TabsProps, Typography } from "antd";
+import { Button, Tabs, TabsProps, Typography } from "antd";
 import { FormatCurrency } from "../utils/formatNumber";
+import LoadingComponent from "../components/LoadingComponent";
+import { colors } from "../constants/listColors";
 
 const OrdersScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -18,6 +20,7 @@ const OrdersScreen = () => {
   const pageRef = useRef(1);
   const [keyStatus, setKeyStatus] = useState<string>(Status.PENDING);
   const isInitLoad = useRef(true);
+  const [isInitLoading, setIsInitLoading] = useState(false);
 
   useEffect(() => {
     if (isInitLoad.current) {
@@ -26,12 +29,14 @@ const OrdersScreen = () => {
     }
   }, []);
 
-  useEffect(()=>{
+  useEffect(() => {
     getOrders();
-  },[keyStatus])
+  }, [keyStatus]);
 
   const getData = async () => {
+    setIsInitLoading(true);
     await getOrders();
+    setIsInitLoading(false);
   };
 
   const getOrders = async () => {
@@ -75,13 +80,14 @@ const OrdersScreen = () => {
     {
       key: Status.RETURNS,
       label: "Returns",
-    },]
+    },
+  ];
 
   const columns: ColumnProps<OrderResponse>[] = [
     {
       title: "#",
       dataIndex: "",
-      width: 120,
+      width: 180,
       render: (item: OrderResponse) => (
         <div>
           <div
@@ -158,10 +164,10 @@ const OrdersScreen = () => {
             ))}
         </div>
       ),
-      width: 300,
+      width: 400,
     },
     {
-      width: 300,
+      width: 400,
       title: "Personal information",
       dataIndex: "",
       render: (order: OrderResponse) => (
@@ -189,6 +195,32 @@ const OrdersScreen = () => {
         </div>
       ),
     },
+    {
+      dataIndex: "",
+      title: "Actions",
+      render: (item: OrderResponse) => (
+        <div>
+          {item.status === Status.PENDING && (
+            <div className="mb-2">
+              <Button style={{ backgroundColor: colors[3] }}>
+                Confirm
+              </Button>
+              <Button className="btn-danger ml-3" size="small">
+                Deny
+              </Button>
+            </div>
+          )}
+          <div>
+            <Button className="m-1" size="small">Shipping</Button>
+            <Button className="m-1" size="small">Delivered</Button>
+            <Button className="m-1" size="small">Completed</Button>
+            <Button className="m-1" size="small">Give back</Button>
+          </div>
+        </div>
+      ),
+      fixed: "right",
+      width: 250,
+    },
   ];
   // const
   const onChange = (key: string) => {
@@ -196,14 +228,16 @@ const OrdersScreen = () => {
     setKeyStatus(key);
   };
 
-  return (
+  return isInitLoading ? (
+    <LoadingComponent />
+  ) : (
     <div>
-      <Tabs 
-          type="card"
-          defaultActiveKey={Status.PENDING}
-          items={items}
-          onChange={onChange}
-        />
+      <Tabs
+        type="card"
+        defaultActiveKey={Status.PENDING}
+        items={items}
+        onChange={onChange}
+      />
       {data && (
         <Table
           rowClassName={() => "custom-row"}
