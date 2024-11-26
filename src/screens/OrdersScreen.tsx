@@ -96,6 +96,10 @@ const OrdersScreen = () => {
       key: Status.RETURNS,
       label: "Returns",
     },
+    {
+      key: Status.DENY,
+      label: "Deny",
+    },
   ];
 
   const updateOrderStatus = async (status: string, orderId: string) => {
@@ -147,11 +151,18 @@ const OrdersScreen = () => {
           </div>
           <div>
             <span>
-              {keyStatus === Status.PENDING ? "Created" : "Updated"}
-              {": "}
+              {'Created: '}
             </span>
             <span>
-              {keyStatus === Status.PENDING ? item.created : item.updated}
+              {item.created}
+            </span>
+          </div>
+          <div>
+            <span>
+              {'Updated: '}
+            </span>
+            <span>
+              {item.updated}
             </span>
           </div>
           <div>
@@ -247,9 +258,9 @@ const OrdersScreen = () => {
               Confirm
             </Button>
             <Button
-              hidden={keyStatus === Status.CANCELLED}
+              hidden={keyStatus === Status.DENY}
               onClick={() => {
-                updateOrderStatus(Status.CANCELLED, item.id);
+                updateOrderStatus(Status.DENY, item.id);
               }}
               className="btn-danger m-1"
               size="small"
@@ -288,6 +299,14 @@ const OrdersScreen = () => {
             >
               Delivered
             </Button>
+            <Button
+              hidden={keyStatus === Status.CANCELLED}
+              onClick={() => {
+                updateOrderStatus(Status.CANCELLED, item.id);
+              }}
+              className="m-1"
+              size="small"
+            >Cancel</Button>
             <Button
               hidden={keyStatus === Status.COMPLETED}
               onClick={() => {
@@ -341,7 +360,7 @@ const OrdersScreen = () => {
             showQuickJumper: false,
             total: pageData.totalElements,
             onChange: (page, _pageSize) => {
-              console.log(page);
+              getOrders(page);
             },
             pageSize: pageData.pageSize,
           }}

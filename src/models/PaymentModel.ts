@@ -20,6 +20,7 @@ export const Status = {
   COMPLETED: "COMPLETED",
   CANCELLED: "CANCELLED",
   RETURNS: "RETURNS",
+  DENY: "DENY"
 } as const;
 
 export const StatusDetails: Record<
@@ -64,6 +65,12 @@ export const StatusDetails: Record<
     description:
       "The order has been returned and is waiting for further processing.",
   },
+  DENY: {
+    label: "Deny",
+    color: "#000000", // Orange
+    description:
+      "Deny",
+  },
 };
 
 export interface OrderRequest {
@@ -88,11 +95,11 @@ export interface ProductRequest {
 
 export interface OrderResponse {
   id: string;
+  created: string,
+  updated: string,
   userId: string;
   customerName: string;
   customerPhone: string;
-  created: string,
-  updated: string,
   customerEmail: string;
   customerAddress: string;
   paymentMethod: string;
