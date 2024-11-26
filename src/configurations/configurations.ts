@@ -20,7 +20,14 @@ export const API = {
   GET_PRODUCT_FILTER_VALUES: "/kanban/sub-products/filter-values",
   PRODUCTS_FILTER_VALUES: "/kanban/products/filter",
   PRODUCT_DETAIL: (productId:string)=> `/kanban/sub-products/product-detail/${productId}`,
-  PROMOTIONS: "/kanban/promotions"
+  PROMOTIONS: "/kanban/promotions",
+  BESTSELLER_PRODUCTS: '/kanban/products/bestseller',
+  CARTS: '/kanban/carts',
+  ADDRESSES: '/profiles/addresses',
+  PROFILES: '/profiles',
+  USER_PROFILE: '/profiles/users',
+  GET_MENU_CATEGORIES_TREE: "/kanban/categories/get-menu-tree",
+  ORDERS: 'kanban/orders'
 };
 
 export const appInfos = {

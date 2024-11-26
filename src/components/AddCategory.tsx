@@ -45,8 +45,9 @@ const AddCategory = (props: Props) => {
       onAddNew();
       form.resetFields();
       setFileList([]);
-    } catch (error) {
+    } catch (error:any) {
       console.log(error);
+      message.error(error.message)
     }
   }
 

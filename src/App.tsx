@@ -5,6 +5,7 @@ import Routers from './routers/Routers';
 import { Provider } from 'react-redux';
 import store from './redux/store';
 import './App.css';
+import { colors } from './constants/listColors';
 
 message.config({
 });
@@ -15,7 +16,7 @@ function App() {
 			<ConfigProvider
 				theme={{
 					token: {
-						colorPrimary: '#131118'
+						colorPrimary: colors[2]
 					},
 					components: {
 						

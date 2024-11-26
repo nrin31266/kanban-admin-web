@@ -137,3 +137,16 @@
 /* Màn hình rất lớn (ví dụ: desktop lớn, từ 992px trở lên) */
 @media (min-width: 992px) {
 }
+
+.order-item-title{
+  display: -webkit-box; /* Sử dụng flexbox để điều chỉnh hiển thị */
+  -webkit-box-orient: vertical; /* Định hướng theo chiều dọc */
+  -webkit-line-clamp: 1; /* Chỉ hiển thị 2 dòng */
+  overflow: hidden; /* Ẩn phần văn bản vượt quá */
+  text-overflow: ellipsis; /* Hiển thị dấu ba chấm */
+  line-height: 1.5; /* Thiết lập chiều cao dòng */
+  max-height: 3em; /* Tối đa chiều cao cho 2 dòng */
+}
+.custom-row td {
+  vertical-align: top; /* Căn chỉnh nội dung lên trên */
+}
