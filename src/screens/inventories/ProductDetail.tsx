@@ -64,7 +64,7 @@ const ProductDetail = () => {
       if (keyTab === 'sub') {
         return <SubProductDetail product={product} />;
       } else {
-        return <ProductRating />;
+        return <ProductRating product={product} />;
       }
     }
   };
