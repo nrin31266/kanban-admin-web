@@ -263,7 +263,6 @@ const OrdersScreen = () => {
                 updateOrderStatus(Status.DENY, item.id);
               }}
               className="btn-danger m-1"
-              size="small"
             >
               Deny
             </Button>
@@ -322,10 +321,10 @@ const OrdersScreen = () => {
               onClick={() => {
                 updateOrderStatus(Status.RETURNS, item.id);
               }}
-              className="m-1"
+              className="m-1 btn-danger"
               size="small"
             >
-              Give back
+              Returns
             </Button>
           </div>
         </div>
@@ -347,7 +346,10 @@ const OrdersScreen = () => {
       <Tabs
         type="card"
         defaultActiveKey={Status.PENDING}
-        items={items}
+        items={items.map((item) => ({
+          ...item,
+          disabled: isLoading,
+        }))}
         onChange={onChange}
       />
       {pageData && (

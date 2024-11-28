@@ -1,31 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { API } from "../../configurations/configurations";
-import handleAPI from "../../apis/handleAPI";
 import {
-  Button,
   Empty,
-  Image,
-  message,
-  Modal,
-  Space,
   Spin,
-  Table,
-  Tag,
-  Tooltip,
-  Typography,
+  Tabs,
+  TabsProps,
+  Typography
 } from "antd";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import handleAPI from "../../apis/handleAPI";
+import { API } from "../../configurations/configurations";
 import {
-  ProductResponse,
-  SubProductRequest,
-  SubProductResponse,
+  ProductResponse
 } from "../../models/Products";
-import { ColumnProps } from "antd/es/table";
-import { getDownloadURL } from "firebase/storage";
-import { FormatCurrency } from "../../utils/formatNumber";
-import { FaEdit } from "react-icons/fa";
-import { RiDeleteBin5Fill } from "react-icons/ri";
-import ModalAddSubProduct from "./../../modals/ModalAddSubProduct";
+import ProductRating from "./components/ProductRating";
+import SubProductDetail from "./components/SubProductDetail";
 
 const ProductDetail = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -33,44 +21,24 @@ const ProductDetail = () => {
   const [searchParams] = useSearchParams();
   const [product, setProduct] = useState<ProductResponse>();
   const productId = searchParams.get("id");
-  const [subProducts, setSubProducts] = useState<SubProductResponse[]>();
-  const [isVisibleModalAddSubProduct, setIsVisibleModalAddSubProduct] =
-    useState<boolean>(false);
-  const [subProductSelected, setSubProductSelected] =
-    useState<SubProductResponse>();
+
+  const items: TabsProps["items"] = [
+    { key: "sub", label: "Sub product" },
+    { key: "rating", label: "Rating" },
+  ];
+
+  const [keyTab, setKeyTab] = useState<string>('sub');
 
   useEffect(() => {
     if (productId) {
       getInitData();
     }
   }, []);
-  useEffect(() => {
-    if (subProductSelected) {
-      setIsVisibleModalAddSubProduct(true);
-    }
-  }, [subProductSelected]);
-
-  const handleSoftRemoveSubProduct = async (subProductId: string[]) => {
-    setIsLoading(true);
-    try {
-      const res = await handleAPI(
-        `${API.SUB_PRODUCTS}/soft-delete`,
-        { ids: subProductId },
-        "put"
-      );
-      message.success("Deleted!");
-      getSubProducts();
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const getInitData = async () => {
     setIsInitLoading(true);
     await getProductDetail();
-    await getSubProducts();
+    // await getSubProducts();
     setIsInitLoading(false);
   };
 
@@ -87,146 +55,19 @@ const ProductDetail = () => {
     }
   };
 
-  const getSubProducts = async () => {
-    if (!productId) {
-      return;
-    }
-    const api = API.PRODUCT_DETAIL(productId);
-    setIsLoading(true);
-    try {
-      const res = await handleAPI(api);
-      setSubProducts(res.data.result);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
+  const onChange = (key: string) => {
+    setKeyTab(key);
   };
 
-  const columns: ColumnProps<SubProductResponse>[] = [
-    {
-      key: "images",
-      dataIndex: "images",
-      title: "Images",
-      render: (imageUrls: []) => {
-        if (!imageUrls) {
-          return (
-            <Typography.Title level={5} type="secondary">
-              No image
-            </Typography.Title>
-          );
-        }
-        return (
-          <div>
-            {imageUrls.map((url, index) => (
-              <Image
-                key={index}
-                src={url}
-                alt={`Image ${index + 1}`}
-                style={{ width: "100px", height: "100px", margin: "5px" }}
-              />
-            ))}
-          </div>
-        );
-      },
-    },
-    {
-      key: "price",
-      dataIndex: "price",
-      title: "Price",
-      render: (price: number) => {
-        return FormatCurrency.VND.format(price);
-      },
-    },
-    {
-      key: "discount",
-      dataIndex: "discount",
-      title: "Discount",
-      render: (discount: number) => {
-        if (discount) {
-          return FormatCurrency.VND.format(discount);
-        } else {
-          return "N/A";
-        }
-      },
-    },
-    {
-      key: "quantity",
-      dataIndex: "quantity",
-      title: "Quantity",
-    },
-    {
-      key: "options",
-      dataIndex: "options",
-      title: "Options",
-      render: (options: any) => {
-        if (product && product.options && product.options.length > 0) {
-          return product.options.map((option) => {
-            const value = options[option];
-            if (value) {
-              return (
-                option=== 'Color' ? <div className="d-flex">
-                  <strong>{option}:</strong>
-                  <div style={{width: 30, height: 30, backgroundColor: value}}></div>
-                  {value}
-                </div> :
-                <div key={option}>
-                  <strong>{option}:</strong>
-
-                  <Tag>{value}</Tag>
-                </div>
-              );
-            }
-            return <span key={option}>No values for {option}</span>;
-          });
-        }
-        return <span>No options available</span>;
-      },
-    },
-
-    {
-      key: "action",
-      dataIndex: "",
-      title: "Actions",
-      fixed: "right",
-      render: (item: SubProductResponse) => (
-        <Space>
-          <Tooltip title={"Edit sub product"} key={"btnEdit"}>
-            <Button
-              className="p-0"
-              size="small"
-              type="text"
-              onClick={() => {
-                setSubProductSelected(item);
-              }}
-            >
-              <FaEdit className="text-primary" size={20} />
-            </Button>
-          </Tooltip>
-          <Tooltip title={"Delete sub product"} key={"btnDelete"}>
-            <Button className="p-0" size="small" type="text" onClick={() => {}}>
-              <RiDeleteBin5Fill
-                className="text-danger"
-                size={20}
-                onClick={() => {
-                  {
-                    Modal.confirm({
-                      title: "Confirm",
-                      content: "Do you really want to remove this sub product?",
-                      onOk: () => {
-                        handleSoftRemoveSubProduct([item.id]);
-                      },
-                      onClose: () => console.log(item.id),
-                    });
-                  }
-                }}
-              />
-            </Button>
-          </Tooltip>
-        </Space>
-      ),
-    },
-  ];
+  const renderContent = () => {
+    if(product){
+      if (keyTab === 'sub') {
+        return <SubProductDetail product={product} />;
+      } else {
+        return <ProductRating />;
+      }
+    }
+  };
 
   return isInitLoading ? (
     <Spin />
@@ -236,51 +77,24 @@ const ProductDetail = () => {
         className="container-fluid"
         style={{ backgroundColor: "", width: "96%", height: "96%" }}
       >
-        <Typography.Title className="mb-0">
+        <Typography.Title level={3} className="mb-0">
           Product: {product.title}
         </Typography.Title>
-        <div className="row">
-          <div className="col">
-            <Typography.Title level={4} className="mt-0" type="secondary">
-              Sub product
-            </Typography.Title>
-          </div>
-          <div className="col text-right">
-            <Tooltip title={"Add sub product"} key={"addSubProduct"}>
-              <Button
-                className=""
-                size="small"
-                type="primary"
-                onClick={() => {
-                  setIsVisibleModalAddSubProduct(true);
-                }}
-              >
-                Add sub product
-              </Button>
-            </Tooltip>
-          </div>
-        </div>
-
-        <Table
-          bordered
-          loading={isLoading}
-          dataSource={subProducts}
-          columns={columns}
+        <Tabs
+          type="card"
+          activeKey={keyTab}
+          items={items.map((item) => ({
+            ...item,
+            disabled: isLoading,
+          }))}
+          onChange={onChange}
         />
+        <div>
+          {
+            renderContent()
+          }
+        </div>
       </div>
-      <ModalAddSubProduct
-        product={product}
-        onClose={() => {
-          setIsVisibleModalAddSubProduct(false);
-          setSubProductSelected(undefined);
-        }}
-        visible={isVisibleModalAddSubProduct}
-        subProduct={subProductSelected}
-        onFinish={() => {
-          setSubProductSelected(undefined);
-          getSubProducts();
-        }}
-      />
     </>
   ) : (
     <Empty />
