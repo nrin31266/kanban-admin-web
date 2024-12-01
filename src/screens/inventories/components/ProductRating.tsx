@@ -87,7 +87,7 @@ const ProductRating = (props: Props) => {
           {reply ?? ""}
         </div>
       ),
-      width: '500px'
+      width: '500px'  
     },
     {
       title: "Actions",

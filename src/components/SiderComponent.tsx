@@ -8,6 +8,7 @@ import { BsInboxes } from "react-icons/bs";
 import { CgList } from "react-icons/cg";
 import { appInfos, colors } from "../configurations/configurations";
 import { FaTags } from "react-icons/fa";
+import Logo from "./Logo";
 
 type MenuItem = Required<MenuProps>["items"][number];
 const { Sider } = Layout;
@@ -73,25 +74,8 @@ const SiderComponent = () => {
         className="sider-component"
         theme="light"
       >
-        <div className=" p-3 d-flex">
-          <img
-            src={appInfos.logo}
-            alt=""
-            style={{
-              width: "48px",
-            }}
-          />
-          <Text
-            className="mt-2"
-            style={{
-              fontWeight: "bold",
-              fontSize: "1.5rem",
-              color: colors.primary500,
-              margin: 0,
-            }}
-          >
-            {appInfos.title}
-          </Text>
+        <div className=" p-3 d-flex" style={{justifyContent: 'center'}}>
+          <Logo/>
         </div>
         <Menu mode="inline" items={items} theme="light"></Menu>
       </Sider>
