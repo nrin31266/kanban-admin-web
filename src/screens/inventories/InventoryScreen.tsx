@@ -244,40 +244,40 @@ const InventoryScreen = () => {
           <span className="text-secondary">No image</span>
         ),
     },
-    {
-      key: "categories",
-      dataIndex: "categoryResponse",
-      title: "Categories",
-      width: 300,
-      render: (categories: CategoryResponse[]) =>
-        categories &&
-        categories.length > 0 && (
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "4px",
-            }}
-          >
-            {categories.map((category: CategoryModel, index) => (
-              <Link
-              key={`category${index}${category.id}`}
-                to={`/categories/detail/${category.slug}?id=${category.id}`}
-              >
-                <Tag
-                  style={{
-                    margin: "0",
-                    padding: "5px",
-                    fontSize: "15px",
-                  }}
-                >
-                  {category.name}
-                </Tag>
-              </Link>
-            ))}
-          </div>
-        ),
-    },
+    // {
+    //   key: "categories",
+    //   dataIndex: "categoryResponse",
+    //   title: "Categories",
+    //   width: 300,
+    //   render: (categories: CategoryResponse[]) =>
+    //     categories &&
+    //     categories.length > 0 && (
+    //       <div
+    //         style={{
+    //           display: "flex",
+    //           flexWrap: "wrap",
+    //           gap: "4px",
+    //         }}
+    //       >
+    //         {categories.map((category: CategoryModel, index) => (
+    //           <Link
+    //           key={`category${index}${category.id}`}
+    //             to={`/categories/detail/${category.slug}?id=${category.id}`}
+    //           >
+    //             <Tag
+    //               style={{
+    //                 margin: "0",
+    //                 padding: "5px",
+    //                 fontSize: "15px",
+    //               }}
+    //             >
+    //               {category.name}
+    //             </Tag>
+    //           </Link>
+    //         ))}
+    //       </div>
+    //     ),
+    // },
     {
       key: 'options',
       title: 'Options list',
@@ -285,13 +285,13 @@ const InventoryScreen = () => {
       width: 300,
       render: (options: string[])=> options && options.map((option, index)=><Tag key={'option'+ index}>{option}</Tag>)
     },
-    {
-      key: 'supplier',
-      title: 'Supplier',
-      dataIndex: 'supplierResponse',
-      width: 100,
-      render: (supplier: SupplierResponse)=> supplier && supplier.photoUrl && <Avatar size={50} src={supplier.photoUrl}/>
-    },
+    // {
+    //   key: 'supplier',
+    //   title: 'Supplier',
+    //   dataIndex: 'supplierResponse',
+    //   width: 100,
+    //   render: (supplier: SupplierResponse)=> supplier && supplier.photoUrl && <Avatar size={50} src={supplier.photoUrl}/>
+    // },
     {
       key: "action",
       dataIndex: "",

@@ -1,7 +1,7 @@
 export const API = {
   USER: "/identity/users",
   USER_INFO: "/identity/users/info",
-  LOGIN: "/identity/auth/login",
+  LOGIN: "/identity/auth/admin",
   LOGOUT: "/identity/auth/logout",
   LOGIN_WITH_GOOGLE: "/identity/auth/outbound/google-login",
   SIGNUP: "/identity/users/create",
